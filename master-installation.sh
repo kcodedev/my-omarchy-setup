@@ -7,6 +7,7 @@
 . ./install-taskwarrior.sh
 . ./install-brave-bin.sh
 . ./install-tmux.sh
+. ./install-kitty.sh
 . ./install-visual-studio-code-bin.sh
 . ./install-cursor-bin.sh
 . ./install-yazi.sh
