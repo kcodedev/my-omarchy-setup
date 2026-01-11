@@ -14,6 +14,7 @@
 . ./install-localsend.sh
 . ./install-obsidian.sh
 . ./install-fuzzel.sh
+. ./install-pipx.sh
 
 # Install my shell-scripts Repo
 . ./install-repo-shell-scripts.sh
