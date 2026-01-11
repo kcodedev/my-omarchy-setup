@@ -17,6 +17,9 @@
 . ./packages/install-fuzzel.sh
 . ./packages/install-pipx.sh
 
+# Install KiloCode CLI
+npm install -g @kilocode/cli
+
 # Install my shell-scripts Repo
 . ./repos/install-repo-shell-scripts.sh
 
