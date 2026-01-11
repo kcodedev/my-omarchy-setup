@@ -13,6 +13,7 @@
 . ./install-podman.sh
 . ./install-localsend.sh
 . ./install-obsidian.sh
+. ./install-fuzzel.sh
 
 # Install my shell-scripts Repo
 . ./install-repo-shell-scripts.sh

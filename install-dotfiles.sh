@@ -27,11 +27,16 @@ fi
 if [ $? -eq 0 ]; then
   echo "removing old configs"
   rm -rf ~/.config/helix
+  rm -rf ~/.config/bash
+  rm -rf ~/.config/fuzzel
+  rm -f ~/.bashrc
+  rm -f ~/.tmux.conf
 
   cd "$REPO_NAME"
-  stow bashrc
+  stow bash
   stow tmux
   stow helix
+  stow fuzzel
 else
   echo "Failed to clone the repository."
   exit 1
