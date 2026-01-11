@@ -11,6 +11,11 @@
 . ./install-cursor-bin.sh
 . ./install-yazi.sh
 . ./install-podman.sh
+. ./install-localsend.sh
+. ./install-obsidian.sh
+
+# Install my shell-scripts Repo
+. ./install-repo-shell-scripts.sh
 
 # Install the hyprland overrides
 . ./install-hyprland-overrides.sh
