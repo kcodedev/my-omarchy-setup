@@ -1,0 +1,18 @@
+# Mappings from omarchy theme names to Helix theme names
+# Format: omarchy_theme=helix_theme
+
+# Direct mappings for exact matches
+catppuccin=catppuccin_mocha
+catppuccin-latte=catppuccin_latte
+everforest=everforest_dark
+flexoki-light=flexoki_light
+gruvbox=gruvbox
+kanagawa=kanagawa
+nord=nord
+rose-pine=rose_pine_dawn
+tokyo-night=tokyonight
+
+# defailt to term16_dark
+ethereal=term16_dark
+osaka-jade=term16_dark
+matte-black=term16_dark
