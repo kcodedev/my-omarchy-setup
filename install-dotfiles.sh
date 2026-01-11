@@ -25,6 +25,8 @@ fi
 
 # Check if the clone was successful
 if [ $? -eq 0 ]; then
+  # Remove old configs before stowing
+  # Stow won't overwrite existing files - it only creates symlinks
   echo "removing old configs"
   rm -rf ~/.config/helix
   rm -rf ~/.config/bash
