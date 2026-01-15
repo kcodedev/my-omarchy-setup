@@ -24,4 +24,7 @@ if [ -d ~/.doom.d ]; then
 fi
 
 # Uninstall Emacs
-yay -Rns --noconfirm emacs 2>/dev/null || true
+installed_emacs=$(pacman -Q | grep '^emacs' | head -1 | awk '{print $1}')
+if [ -n "$installed_emacs" ]; then
+    yay -Rns --noconfirm "$installed_emacs" 2>/dev/null || true
+fi
