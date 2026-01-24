@@ -9,7 +9,7 @@ THEME="${1:-dark}"  # Default to dark if not provided
 
 # Load theme mappings from file
 declare -A THEME_MAP
-MAPPINGS_FILE="$(dirname "$0")/theme-mappings.txt"
+MAPPINGS_FILE="$(dirname "$0")/hx-theme-mappings.txt"
 if [ -f "$MAPPINGS_FILE" ]; then
   while IFS='=' read -r key value; do
     # Skip comments and empty lines
