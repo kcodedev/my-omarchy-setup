@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Script to update Helix theme based on omarchy theme change
-# Called from theme-set hook with theme name as argument
+# Omarchy comes with theme-set.sample file in .config/omarchy/hooks
+# Copy it to theme-set and modify it to call this script
+# ~/Repos/my-omarchy-setup/theme-changer/update-helix-theme.sh "$1"
 
 THEME="${1:-dark}"  # Default to dark if not provided
 
