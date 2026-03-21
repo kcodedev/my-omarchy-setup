@@ -19,6 +19,7 @@
 . ./packages/install-pipx.sh
 . ./packages/install-glow.sh
 . ./packages/install-bash-language-server.sh
+. ./packages/install-models.sh
 
 # Install KiloCode CLI
 npm install -g @kilocode/cli
