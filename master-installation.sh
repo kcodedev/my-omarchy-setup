@@ -16,6 +16,7 @@
 . ./packages/install-obsidian.sh
 . ./packages/install-fuzzel.sh
 . ./packages/install-pipx.sh
+. ./packages/install-glow.sh
 
 # Install KiloCode CLI
 npm install -g @kilocode/cli
@@ -28,4 +29,3 @@ npm install -g @kilocode/cli
 
 # Install dotfiles to the home directory
 . ./repos/install-dotfiles.sh
-
