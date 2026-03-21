@@ -6,6 +6,7 @@
 . ./packages/install-keepassxc.sh
 . ./packages/install-taskwarrior.sh
 . ./packages/install-brave-bin.sh
+. ./packages/install-zellij.sh
 . ./packages/install-tmux.sh
 . ./packages/install-kitty.sh
 . ./packages/install-visual-studio-code-bin.sh
@@ -17,6 +18,7 @@
 . ./packages/install-fuzzel.sh
 . ./packages/install-pipx.sh
 . ./packages/install-glow.sh
+. ./packages/install-bash-language-server.sh
 
 # Install KiloCode CLI
 npm install -g @kilocode/cli
