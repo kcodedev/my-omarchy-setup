@@ -4,28 +4,27 @@ This folder contains scripts to automatically update Helix editor themes when th
 
 ## Files
 
-- `update-helix-theme.sh`: The main script that updates the Helix config with the appropriate theme.
-- `theme-mappings.txt`: A key-value file mapping omarchy theme names to Helix theme names.
+- `update-helix-theme.sh`: Updates the Helix config with the appropriate theme.
+- `hx-theme-mappings.txt`: Maps Omarchy theme names to Helix theme names.
+- `install-omarchy-theme-hook.sh`: Recreates the missing Omarchy `theme-set` hook.
 
 ## Setup
 
-1. Ensure your omarchy theme switcher has a hook script (e.g., `theme-set`) that runs on theme changes. The hook is located at `~/.config/omarchy/hooks/theme-set`.
-
-2. Add the following line to your `theme-set` hook script:
+1. Install the hook with:
 
    ```bash
-   ~/Repos/my-omarchy-setup/theme-changer/update-helix-theme.sh "$1"
+   ~/Repos/my-omarchy-setup/theme-changer/install-omarchy-theme-hook.sh
    ```
 
-   Adjust the path if your repo is cloned elsewhere.
+2. This recreates `~/.config/omarchy/hooks/theme-set` and points it at `update-helix-theme.sh`.
 
-3. The script will update `~/.config/helix/config.toml` with the matching theme.
+3. The updater script changes `~/.config/helix/config.toml` to the mapped Helix theme.
 
-4. Manually reload the config in Helix by running `:config-reload` in the editor.
+4. Reload the config in Helix with `:config-reload`.
 
 ## Customization
 
-Edit `theme-mappings.txt` to add or change mappings. Format:
+Edit `hx-theme-mappings.txt` to add or change mappings. Format:
 
 ```
 omarchy_theme=helix_theme
@@ -40,7 +39,7 @@ If a theme is not found in the mappings, it defaults to `term16_dark`.
 
 ## Supported Themes
 
-The script supports the following Helix themes (add more to `theme-mappings.txt` as needed):
+The script supports the following Helix themes (add more to `hx-theme-mappings.txt` as needed):
 
 - catppuccin_mocha
 - catppuccin_latte
