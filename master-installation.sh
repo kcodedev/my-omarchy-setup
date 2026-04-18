@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 # Install all the necessary packages
 . ./packages/install-stow.sh
 . ./packages/install-helix.sh
