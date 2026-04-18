@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ORIGINAL_DIR="$(pwd)"
+
 REPO_URL="git@github.com:kcodedev/shell-scripts.git"
 REPO_NAME="shell-scripts"
 REPOS_DIR="$HOME/Repos"
@@ -29,3 +31,5 @@ else
 fi
 
 echo "Shell-scripts repo setup complete!"
+
+cd "$ORIGINAL_DIR"

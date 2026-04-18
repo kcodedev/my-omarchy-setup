@@ -1,6 +1,6 @@
 #!/bin/bash
-# 
-ORIGINAL_DIR=$(pwd)
+
+ORIGINAL_DIR="$(pwd)"
 
 REPO_URL="git@github.com:kcodedev/dotfiles.git"
 REPO_NAME="dotfiles"
@@ -40,7 +40,9 @@ if [ $? -eq 0 ]; then
   stow helix
   stow fuzzel
 else
-  echo "Failed to clone the repository."
-  exit 1
+    echo "Failed to clone the repository."
+    exit 1
 fi
+
+cd "$ORIGINAL_DIR"
 
