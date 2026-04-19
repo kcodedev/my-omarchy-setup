@@ -14,6 +14,12 @@ tokyo-night=tokyonight
 
 # Default to term16_dark
 ethereal=term16_dark
-osaka-jade=term16_dark
+hackerman=term16_dark
+lumon=term16_dark
 matte-black=term16_dark
+miasma=term16_dark
+osaka-jade=term16_dark
+retro-82=term16_dark
+ristretto=term16_dark
 vantablack=base16_transparent
+white=term16_dark
