@@ -23,6 +23,7 @@ PACKAGE_SCRIPTS=(
     "packages/install-localsend.sh"
     "packages/install-obsidian.sh"
     "packages/install-dbeaver.sh"
+    "packages/install-dropbox-cli.sh"
     "packages/install-fuzzel.sh"
     "packages/install-cava.sh"
     "packages/install-lazygit.sh"
