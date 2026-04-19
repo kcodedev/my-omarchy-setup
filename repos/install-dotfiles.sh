@@ -9,6 +9,29 @@ REPO_NAME="dotfiles"
 REPO_DIR="$HOME/$REPO_NAME"
 BACKUP_DIR="$HOME/.config-backups/dotfiles-$(date +%Y%m%d-%H%M%S)"
 
+package_targets() {
+  find "$REPO_DIR" -mindepth 1 -maxdepth 1 -type d ! -name '.git' -printf '%f\n' | sort
+}
+
+backup_package_targets() {
+  local package="$1"
+  local entry
+  local child
+
+  while IFS= read -r entry; do
+    [ -n "$entry" ] || continue
+
+    if [ "$entry" = ".config" ] && [ -d "$package/.config" ]; then
+      while IFS= read -r child; do
+        [ -n "$child" ] || continue
+        backup_path "$HOME/.config/$child"
+      done < <(find "$package/.config" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)
+    else
+      backup_path "$HOME/$entry"
+    fi
+  done < <(find "$package" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)
+}
+
 backup_path() {
   local target="$1"
   local backup_target
@@ -36,16 +59,19 @@ else
   git clone "$REPO_URL"
 fi
 
-backup_path "$HOME/.config/helix"
-backup_path "$HOME/.config/bash"
-backup_path "$HOME/.config/fuzzel"
-backup_path "$HOME/.bashrc"
-backup_path "$HOME/.tmux.conf"
-
 cd "$REPO_DIR"
-stow bash
-stow tmux
-stow helix
-stow fuzzel
+
+mapfile -t packages < <(package_targets)
+
+if [ "${#packages[@]}" -eq 0 ]; then
+  echo "No stow packages found in $REPO_DIR"
+  exit 1
+fi
+
+for package in "${packages[@]}"; do
+  backup_package_targets "$package"
+done
+
+stow -t "$HOME" "${packages[@]}"
 
 cd "$ORIGINAL_DIR"

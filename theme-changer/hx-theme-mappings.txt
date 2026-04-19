@@ -12,7 +12,8 @@ nord=nord
 rose-pine=rose_pine_dawn
 tokyo-night=tokyonight
 
-# defailt to term16_dark
+# Default to term16_dark
 ethereal=term16_dark
 osaka-jade=term16_dark
 matte-black=term16_dark
+vantablack=base16_transparent

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INPUT_OVERRIDES="$SCRIPT_DIR/input-overrides.conf"
@@ -27,3 +27,7 @@ else
 fi
 
 echo "Input overrides setup complete!"
+
+if command -v hyprctl >/dev/null 2>&1; then
+    hyprctl reload >/dev/null 2>&1 || true
+fi

@@ -15,7 +15,14 @@ require_command() {
 }
 
 run_script() {
-    . "$SCRIPT_DIR/$1"
+    local script_path="$SCRIPT_DIR/$1"
+
+    if [ ! -f "$script_path" ]; then
+        echo "Missing install script: $script_path"
+        exit 1
+    fi
+
+    bash "$script_path"
 }
 
 require_command yay
@@ -55,3 +62,6 @@ run_script install-input-overrides.sh
 
 # Install dotfiles to the home directory
 run_script repos/install-dotfiles.sh
+
+# Install the Omarchy -> Helix theme hook
+run_script theme-changer/install-omarchy-theme-hook.sh

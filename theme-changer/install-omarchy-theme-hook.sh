@@ -27,3 +27,4 @@ fi
 "$HELIX_UPDATER" "$current_theme"
 
 printf 'Installed Omarchy theme hook at %s\n' "$HOOK_FILE"
+printf 'Current Omarchy theme: %s\n' "${current_theme:-dark}"
