@@ -42,7 +42,9 @@ run_script packages/install-yazi.sh
 run_script packages/install-podman.sh
 run_script packages/install-localsend.sh
 run_script packages/install-obsidian.sh
+run_script packages/install-dbeaver.sh
 run_script packages/install-fuzzel.sh
+run_script packages/install-cava.sh
 run_script packages/install-lazygit.sh
 run_script packages/install-nodejs-npm.sh
 run_script packages/install-pipx.sh
