@@ -25,7 +25,6 @@ require_command git
 run_script packages/install-stow.sh
 run_script packages/install-helix.sh
 run_script packages/install-keepassxc.sh
-run_script packages/install-taskwarrior.sh
 run_script packages/install-brave-bin.sh
 run_script packages/install-zellij.sh
 run_script packages/install-tmux.sh
@@ -37,6 +36,7 @@ run_script packages/install-podman.sh
 run_script packages/install-localsend.sh
 run_script packages/install-obsidian.sh
 run_script packages/install-fuzzel.sh
+run_script packages/install-lazygit.sh
 run_script packages/install-nodejs-npm.sh
 run_script packages/install-pipx.sh
 run_script packages/install-glow.sh
