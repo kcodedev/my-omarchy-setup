@@ -1,37 +1,57 @@
 #!/bin/bash
 
+set -euo pipefail
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+require_command() {
+    local command_name="$1"
+
+    if ! command -v "$command_name" >/dev/null 2>&1; then
+        echo "Missing required command: $command_name"
+        exit 1
+    fi
+}
+
+run_script() {
+    . "$SCRIPT_DIR/$1"
+}
+
+require_command yay
+require_command git
+
 # Install all the necessary packages
-. ./packages/install-stow.sh
-. ./packages/install-helix.sh
-. ./packages/install-keepassxc.sh
-. ./packages/install-taskwarrior.sh
-. ./packages/install-brave-bin.sh
-. ./packages/install-zellij.sh
-. ./packages/install-tmux.sh
-. ./packages/install-kitty.sh
-. ./packages/install-visual-studio-code-bin.sh
-. ./packages/install-cursor-bin.sh
-. ./packages/install-yazi.sh
-. ./packages/install-podman.sh
-. ./packages/install-localsend.sh
-. ./packages/install-obsidian.sh
-. ./packages/install-fuzzel.sh
-. ./packages/install-pipx.sh
-. ./packages/install-glow.sh
-. ./packages/install-bash-language-server.sh
-. ./packages/install-models.sh
+run_script packages/install-stow.sh
+run_script packages/install-helix.sh
+run_script packages/install-keepassxc.sh
+run_script packages/install-taskwarrior.sh
+run_script packages/install-brave-bin.sh
+run_script packages/install-zellij.sh
+run_script packages/install-tmux.sh
+run_script packages/install-kitty.sh
+run_script packages/install-visual-studio-code-bin.sh
+run_script packages/install-cursor-bin.sh
+run_script packages/install-yazi.sh
+run_script packages/install-podman.sh
+run_script packages/install-localsend.sh
+run_script packages/install-obsidian.sh
+run_script packages/install-fuzzel.sh
+run_script packages/install-nodejs-npm.sh
+run_script packages/install-pipx.sh
+run_script packages/install-glow.sh
+run_script packages/install-bash-language-server.sh
+run_script packages/install-models.sh
 
 # Install KiloCode CLI
-npm install -g @kilocode/cli
+run_script packages/install-kilocode-cli.sh
 
 # Install my shell-scripts Repo
-. ./repos/install-repo-shell-scripts.sh
+run_script repos/install-repo-shell-scripts.sh
 
-# Install the hyprland overrides
-. ./install-hyprland-overrides.sh
+# Install the Hyprland overrides
+run_script install-hyprland-overrides.sh
+run_script install-input-overrides.sh
 
 # Install dotfiles to the home directory
-. ./repos/install-dotfiles.sh
+run_script repos/install-dotfiles.sh

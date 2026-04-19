@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# Install pipx
-yay -S --noconfirm --needed pipx
+set -euo pipefail
 
-# Install pylsp and mypy using pipx
-pipx install python-lsp-server
-pipx install mypy
+yay -S --noconfirm --needed python-pipx
+pipx ensurepath >/dev/null 2>&1 || true
+
+pipx install --force python-lsp-server
+pipx install --force mypy

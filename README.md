@@ -31,9 +31,11 @@ When Hyprland reads its config, it processes the `source` directive, merging the
 
 - Arch Linux with yay installed
 - Git configured for SSH access to private repos
+- `~/.local/bin` on your `PATH` if you want npm global installs to fall back to a user-local prefix
 
 ## Notes
 
-- Scripts check for existing installations to avoid duplicates
+- The main installer fails fast on command errors and now includes both Hyprland override installers
+- Dotfiles are backed up to `~/.config-backups/` before stowing instead of being deleted
 - Hardware-specific scripts include detection to prevent running on incompatible systems
 - Reboot recommended after installing kernel modules (e.g., FacetimeHD)
