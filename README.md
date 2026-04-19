@@ -23,9 +23,9 @@ When Hyprland reads its config, it processes the `source` directive, merging the
 ## Usage
 
 1. Clone this repository
-2. Make scripts executable: `chmod +x *.sh */*.sh`
-3. Run the master installation: `./master-installation.sh`
-4. For hardware-specific setups (e.g., MacBook Air), run the appropriate script manually: `./hardware/install-macbook-air.sh`
+2. Run a full machine bootstrap: `./master-installation.sh install`
+3. Re-sync an existing machine after repo changes: `./master-installation.sh sync`
+4. Inspect the current machine state without changing anything: `./master-installation.sh doctor`
 
 ## Prerequisites
 
@@ -35,7 +35,10 @@ When Hyprland reads its config, it processes the `source` directive, merging the
 
 ## Notes
 
-- The main installer fails fast on command errors and now includes both Hyprland override installers
+- `install` auto-detects MacBook hardware and runs the hardware extras for that host
+- `sync` updates existing repos with `git pull --ff-only` when they are clean, and skips pulling if you have local changes
+- `doctor` reports command availability, repo state, Hyprland override status, and Omarchy hook status
+- Hyprland-specific steps now skip cleanly when `~/.config/hypr/hyprland.conf` is not present
 - Dotfiles are backed up to `~/.config-backups/` before stowing instead of being deleted
 - Hardware-specific scripts include detection to prevent running on incompatible systems
 - Reboot recommended after installing kernel modules (e.g., FacetimeHD)

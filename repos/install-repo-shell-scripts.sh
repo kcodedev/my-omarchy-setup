@@ -10,6 +10,24 @@ REPOS_DIR="$HOME/Repos"
 REPO_DIR="$REPOS_DIR/$REPO_NAME"
 BIN_DIR="$HOME/.local/bin"
 
+update_repo() {
+    if [ -d "$REPO_DIR/.git" ]; then
+        if [ -n "$(git -C "$REPO_DIR" status --porcelain 2>/dev/null)" ]; then
+            echo "Repository '$REPO_NAME' has local changes. Skipping pull"
+        else
+            echo "Updating $REPO_NAME in $REPOS_DIR"
+            git -C "$REPO_DIR" pull --ff-only
+        fi
+    elif [ -d "$REPO_DIR" ]; then
+        echo "Path exists but is not a git repository: $REPO_DIR"
+        exit 1
+    else
+        echo "Cloning $REPO_NAME to $REPOS_DIR"
+        git clone "$REPO_URL"
+        echo "Successfully cloned $REPO_NAME to $REPOS_DIR"
+    fi
+}
+
 install_wrapper() {
     local command_name="$1"
     local target_script="$2"
@@ -39,13 +57,7 @@ fi
 
 cd "$REPOS_DIR"
 
-if [ -d "$REPO_NAME" ]; then
-    echo "Repository '$REPO_NAME' already exists in $REPOS_DIR. Skipping clone"
-else
-    echo "Cloning $REPO_NAME to $REPOS_DIR"
-    git clone "$REPO_URL"
-    echo "Successfully cloned $REPO_NAME to $REPOS_DIR"
-fi
+update_repo
 
 install_wrapper "kc-project-launch" "project-launch.sh"
 install_wrapper "kc-project-launch-active" "project-launch.sh" "active"

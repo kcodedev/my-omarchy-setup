@@ -10,8 +10,8 @@ SOURCE_LINE="source = $OVERRIDES_CONFIG"
 # Check if hyprland config exists
 if [ ! -f "$HYPRLAND_CONFIG" ]; then
     echo "Hyprland config not found at $HYPRLAND_CONFIG"
-    echo "Please install hyprland first"
-    exit 1
+    echo "Skipping Hyprland overrides"
+    exit 0
 fi
 
 # Check if overrides config exists

@@ -10,7 +10,8 @@ HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
 
 if [ ! -f "$HYPRLAND_CONF" ]; then
     echo "Hyprland config not found at $HYPRLAND_CONF"
-    exit 1
+    echo "Skipping input overrides"
+    exit 0
 fi
 
 if [ ! -f "$INPUT_OVERRIDES" ]; then

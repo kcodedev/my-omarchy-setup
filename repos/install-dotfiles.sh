@@ -9,6 +9,22 @@ REPO_NAME="dotfiles"
 REPO_DIR="$HOME/$REPO_NAME"
 BACKUP_DIR="$HOME/.config-backups/dotfiles-$(date +%Y%m%d-%H%M%S)"
 
+update_repo() {
+  if [ -d "$REPO_DIR/.git" ]; then
+    if [ -n "$(git -C "$REPO_DIR" status --porcelain 2>/dev/null)" ]; then
+      echo "Repository '$REPO_NAME' has local changes. Skipping pull"
+    else
+      echo "Updating repository '$REPO_NAME'"
+      git -C "$REPO_DIR" pull --ff-only
+    fi
+  elif [ -d "$REPO_DIR" ]; then
+    echo "Path exists but is not a git repository: $REPO_DIR"
+    exit 1
+  else
+    git clone "$REPO_URL"
+  fi
+}
+
 package_targets() {
   find "$REPO_DIR" -mindepth 1 -maxdepth 1 -type d ! -name '.git' -printf '%f\n' | sort
 }
@@ -53,11 +69,7 @@ fi
 
 cd "$HOME"
 
-if [ -d "$REPO_DIR" ]; then
-  echo "Repository '$REPO_NAME' already exists. Skipping clone"
-else
-  git clone "$REPO_URL"
-fi
+update_repo
 
 cd "$REPO_DIR"
 

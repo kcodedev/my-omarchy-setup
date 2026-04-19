@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # Check if running on MacBook hardware
 PRODUCT_NAME=$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "Unknown")
 if [[ $PRODUCT_NAME != *"MacBook"* ]]; then
