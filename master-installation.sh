@@ -259,6 +259,8 @@ Usage: ./master-installation.sh [install|sync|doctor]
 install  Full setup run, including host-specific extras.
 sync     Re-run the reusable setup steps and update existing repos.
 doctor   Inspect local setup state without changing anything.
+
+Set BOOTSTRAP_UPGRADE=1 to upgrade already-installed npm and pipx tools.
 EOF
         ;;
     *)

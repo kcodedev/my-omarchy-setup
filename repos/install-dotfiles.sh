@@ -51,9 +51,21 @@ backup_package_targets() {
 backup_path() {
   local target="$1"
   local backup_target
+  local resolved_target
 
   if [ ! -e "$target" ] && [ ! -L "$target" ]; then
     return 0
+  fi
+
+  if [ -L "$target" ]; then
+    resolved_target="$(readlink -f "$target" 2>/dev/null || true)"
+
+    case "$resolved_target" in
+      "$REPO_DIR"/*)
+        echo "Skipping managed symlink: $target"
+        return 0
+        ;;
+    esac
   fi
 
   backup_target="$BACKUP_DIR/${target#$HOME/}"

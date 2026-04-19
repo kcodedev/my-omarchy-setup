@@ -6,7 +6,7 @@ This folder contains scripts to automatically update Helix editor themes when th
 
 - `update-helix-theme.sh`: Updates the Helix config with the appropriate theme.
 - `hx-theme-mappings.txt`: Maps Omarchy theme names to Helix theme names.
-- `install-omarchy-theme-hook.sh`: Recreates the missing Omarchy `theme-set` hook.
+- `install-omarchy-theme-hook.sh`: Installs a managed Omarchy `theme-set` hook and preserves any existing hook.
 
 ## Setup
 
@@ -16,7 +16,7 @@ This folder contains scripts to automatically update Helix editor themes when th
    ~/Repos/my-omarchy-setup/theme-changer/install-omarchy-theme-hook.sh
    ```
 
-2. This recreates `~/.config/omarchy/hooks/theme-set` and points it at `update-helix-theme.sh`.
+2. This installs `~/.config/omarchy/hooks/theme-set`, preserves any existing hook as `theme-set.original`, and then points the managed hook at `update-helix-theme.sh`.
 
 3. The updater script changes `~/.config/helix/config.toml` to the mapped Helix theme.
 

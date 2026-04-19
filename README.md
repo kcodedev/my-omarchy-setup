@@ -26,6 +26,7 @@ When Hyprland reads its config, it processes the `source` directive, merging the
 2. Run a full machine bootstrap: `./master-installation.sh install`
 3. Re-sync an existing machine after repo changes: `./master-installation.sh sync`
 4. Inspect the current machine state without changing anything: `./master-installation.sh doctor`
+5. Upgrade already-installed npm and pipx tools during a sync: `BOOTSTRAP_UPGRADE=1 ./master-installation.sh sync`
 
 ## Prerequisites
 
@@ -37,8 +38,10 @@ When Hyprland reads its config, it processes the `source` directive, merging the
 
 - `install` auto-detects MacBook hardware and runs the hardware extras for that host
 - `sync` updates existing repos with `git pull --ff-only` when they are clean, and skips pulling if you have local changes
+- `sync` now leaves repo-managed dotfile symlinks in place instead of backing them up again
 - `doctor` reports command availability, repo state, Hyprland override status, and Omarchy hook status
 - Hyprland-specific steps now skip cleanly when `~/.config/hypr/hyprland.conf` is not present
 - Dotfiles are backed up to `~/.config-backups/` before stowing instead of being deleted
+- npm and pipx tools are only upgraded when `BOOTSTRAP_UPGRADE=1` is set
 - Hardware-specific scripts include detection to prevent running on incompatible systems
 - Reboot recommended after installing kernel modules (e.g., FacetimeHD)
