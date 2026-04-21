@@ -9,6 +9,7 @@ MODE="${1:-install}"
 PRODUCT_NAME="$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "Unknown")"
 
 YAY_PACKAGES=(
+    jq
     stow
     helix
     keepassxc
@@ -122,6 +123,35 @@ report_command_status() {
     fi
 }
 
+report_brave_vertical_tabs_status() {
+    local preferences_file="$HOME/.config/BraveSoftware/Brave-Browser/Default/Preferences"
+    local vertical_tabs_enabled
+    local vertical_tabs_collapsed
+    local hide_when_collapsed
+
+    if [ ! -f "$preferences_file" ]; then
+        print_status "brave vertical tabs" "missing" "$preferences_file not present"
+        return
+    fi
+
+    if ! command -v jq >/dev/null 2>&1; then
+        print_status "brave vertical tabs" "unknown" "jq not installed"
+        return
+    fi
+
+    vertical_tabs_enabled="$(jq -r 'if .brave.tabs.vertical_tabs_enabled == null then false else .brave.tabs.vertical_tabs_enabled end' "$preferences_file" 2>/dev/null || echo false)"
+    vertical_tabs_collapsed="$(jq -r 'if .brave.tabs.vertical_tabs_collapsed == null then false else .brave.tabs.vertical_tabs_collapsed end' "$preferences_file" 2>/dev/null || echo false)"
+    hide_when_collapsed="$(jq -r 'if .brave.tabs.vertical_tabs_hide_completely_when_collapsed == null then true else .brave.tabs.vertical_tabs_hide_completely_when_collapsed end' "$preferences_file" 2>/dev/null || echo true)"
+
+    if [ "$vertical_tabs_enabled" = "true" ] &&
+       [ "$vertical_tabs_collapsed" = "true" ] &&
+       [ "$hide_when_collapsed" = "false" ]; then
+        print_status "brave vertical tabs" "installed"
+    else
+        print_status "brave vertical tabs" "drifted" "$preferences_file"
+    fi
+}
+
 report_repo_status() {
     local label="$1"
     local repo_dir="$2"
@@ -171,6 +201,7 @@ doctor() {
     report_command_status stow
     report_command_status npm
     report_command_status pipx
+    report_command_status jq
 
     if has_local_bin_on_path; then
         print_status "PATH ~/.local/bin" "ok"
@@ -193,6 +224,7 @@ doctor() {
         "input overrides" \
         "$HOME/.config/hypr/hyprland.conf" \
         "source = $SCRIPT_DIR/input-overrides.conf"
+    report_brave_vertical_tabs_status
 
     if [ -x "$HOME/.config/omarchy/hooks/theme-set" ]; then
         print_status "omarchy theme hook" "installed"
@@ -218,7 +250,7 @@ perform_install() {
         include_theme_hook=1
     fi
 
-    step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 2))
+    step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 3))
 
     if [ "$MODE" = "install" ] && is_macbook_host; then
         step_total=$((step_total + 1))
@@ -243,6 +275,7 @@ perform_install() {
     done
     run_step "Syncing shell-scripts repo and wrappers" run_script repos/install-repo-shell-scripts.sh
     run_step "Syncing dotfiles" run_script repos/install-dotfiles.sh
+    run_step "Applying Brave preferences" run_script browsers/apply-brave-preferences.sh
 
     if [ "$MODE" = "install" ] && is_macbook_host; then
         run_step "Running MacBook hardware extras" run_script hardware/install-macbook-air.sh

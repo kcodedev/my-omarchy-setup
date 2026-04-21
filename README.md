@@ -5,6 +5,7 @@ This repository contains installation scripts for setting up an Arch Linux envir
 ## Structure
 
 - `packages/` - Special-case package installers; plain `yay` packages are declared in `master-installation.sh`
+- `browsers/` - Browser-specific preference bootstrap scripts
 - `cleanup/` - Explicit cleanup and removal scripts for one-off maintenance tasks
 - `repos/` - Scripts for cloning and setting up personal repositories
 - `hardware/` - Hardware-specific installation scripts (e.g., for MacBook Air)
@@ -45,6 +46,7 @@ When Hyprland reads its config, it processes the `source` directive, merging the
 - `install` auto-detects MacBook hardware and runs the hardware extras for that host
 - `sync` updates existing repos with `git pull --ff-only` when they are clean, and skips pulling if you have local changes
 - `sync` now leaves repo-managed dotfile symlinks in place instead of backing them up again
+- Brave preferences are re-applied during install/sync for repo-managed defaults such as vertical tabs
 - `doctor` reports command availability, repo state, Hyprland override status, and Omarchy hook status
 - `master-cleanup.sh` runs the repo cleanup scripts without mixing removals into install/sync
 - Hyprland-specific steps now skip cleanly when `~/.config/hypr/hyprland.conf` is not present
