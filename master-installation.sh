@@ -211,7 +211,7 @@ perform_install() {
     fi
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
-        step_total=$((step_total + 3))
+        step_total=$((step_total + 1))
     fi
 
     if [ "$include_theme_hook" -eq 1 ]; then
@@ -235,9 +235,7 @@ perform_install() {
     fi
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
-        run_step "Installing Hyprland overrides" run_script install-hyprland-overrides.sh
-        run_step "Installing look'n'feel overrides" run_script install-looknfeel-overrides.sh
-        run_step "Installing input overrides" run_script install-input-overrides.sh
+        run_step "Installing Hyprland source overrides" run_script install-hyprland-overrides.sh
     else
         echo
         echo "[skip] Hyprland config not present; skipping Hyprland-specific steps"
