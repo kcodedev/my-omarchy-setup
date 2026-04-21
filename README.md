@@ -9,6 +9,7 @@ This repository contains installation scripts for setting up an Arch Linux envir
 - `repos/` - Scripts for cloning and setting up personal repositories
 - `hardware/` - Hardware-specific installation scripts (e.g., for MacBook Air)
 - `master-installation.sh` - Main script that runs all installations in order
+- `master-cleanup.sh` - Main script that runs the repo cleanup scripts in one pass
 - `install-hyprland-overrides.sh` - Script to source all Hyprland override files into `hyprland.conf`
 
 ## Hyprland Overrides
@@ -30,6 +31,8 @@ When Hyprland reads its config, it processes the `source` directive, merging the
 3. Re-sync an existing machine after repo changes: `./master-installation.sh sync`
 4. Inspect the current machine state without changing anything: `./master-installation.sh doctor`
 5. Upgrade already-installed npm and pipx tools during a sync: `BOOTSTRAP_UPGRADE=1 ./master-installation.sh sync`
+6. Remove unwanted Omarchy apps in one pass: `./master-cleanup.sh`
+7. Also purge app data for supported cleanup scripts: `./master-cleanup.sh --purge-data`
 
 ## Prerequisites
 
@@ -43,6 +46,7 @@ When Hyprland reads its config, it processes the `source` directive, merging the
 - `sync` updates existing repos with `git pull --ff-only` when they are clean, and skips pulling if you have local changes
 - `sync` now leaves repo-managed dotfile symlinks in place instead of backing them up again
 - `doctor` reports command availability, repo state, Hyprland override status, and Omarchy hook status
+- `master-cleanup.sh` runs the repo cleanup scripts without mixing removals into install/sync
 - Hyprland-specific steps now skip cleanly when `~/.config/hypr/hyprland.conf` is not present
 - Dotfiles are backed up to `~/.config-backups/` before stowing instead of being deleted
 - npm and pipx tools are only upgraded when `BOOTSTRAP_UPGRADE=1` is set
