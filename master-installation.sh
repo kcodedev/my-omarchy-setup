@@ -8,30 +8,36 @@ cd "$SCRIPT_DIR"
 MODE="${1:-install}"
 PRODUCT_NAME="$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "Unknown")"
 
-PACKAGE_SCRIPTS=(
-    "packages/install-stow.sh"
-    "packages/install-helix.sh"
-    "packages/install-keepassxc.sh"
-    "packages/install-brave-bin.sh"
-    "packages/install-zellij.sh"
-    "packages/install-tmux.sh"
-    "packages/install-kitty.sh"
-    "packages/install-visual-studio-code-bin.sh"
-    "packages/install-cursor-bin.sh"
-    "packages/install-yazi.sh"
-    "packages/install-podman.sh"
-    "packages/install-localsend.sh"
-    "packages/install-obsidian.sh"
-    "packages/install-dbeaver.sh"
-    "packages/install-dropbox-cli.sh"
-    "packages/install-fuzzel.sh"
-    "packages/install-cava.sh"
-    "packages/install-lazygit.sh"
-    "packages/install-nodejs-npm.sh"
+YAY_PACKAGES=(
+    stow
+    helix
+    keepassxc
+    brave-bin
+    zellij
+    tmux
+    kitty
+    visual-studio-code-bin
+    cursor-bin
+    yazi
+    podman
+    podman-compose
+    localsend
+    obsidian
+    dbeaver
+    dropbox-cli
+    fuzzel
+    cava
+    lazygit
+    nodejs
+    npm
+    glow
+    bash-language-server
+    models-bin
+)
+
+SPECIAL_INSTALL_SCRIPTS=(
     "packages/install-pipx.sh"
-    "packages/install-glow.sh"
-    "packages/install-bash-language-server.sh"
-    "packages/install-models.sh"
+    "packages/install-kilocode-cli.sh"
 )
 
 step_index=0
@@ -55,6 +61,15 @@ run_script() {
     fi
 
     bash "$script_path"
+}
+
+install_yay_packages() {
+    if [ "$#" -eq 0 ]; then
+        echo "No packages provided for yay install"
+        exit 1
+    fi
+
+    yay -S --noconfirm --needed "$@"
 }
 
 run_step() {
@@ -203,8 +218,7 @@ perform_install() {
         include_theme_hook=1
     fi
 
-    step_total=${#PACKAGE_SCRIPTS[@]}
-    step_total=$((step_total + 3))
+    step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 2))
 
     if [ "$MODE" = "install" ] && is_macbook_host; then
         step_total=$((step_total + 1))
@@ -222,11 +236,11 @@ perform_install() {
     echo "Detected host: $PRODUCT_NAME"
     echo
 
-    for package_script in "${PACKAGE_SCRIPTS[@]}"; do
+    run_step "Installing base yay packages" install_yay_packages "${YAY_PACKAGES[@]}"
+
+    for package_script in "${SPECIAL_INSTALL_SCRIPTS[@]}"; do
         run_step "Running $package_script" run_script "$package_script"
     done
-
-    run_step "Installing KiloCode CLI" run_script packages/install-kilocode-cli.sh
     run_step "Syncing shell-scripts repo and wrappers" run_script repos/install-repo-shell-scripts.sh
     run_step "Syncing dotfiles" run_script repos/install-dotfiles.sh
 

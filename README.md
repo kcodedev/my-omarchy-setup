@@ -4,7 +4,7 @@ This repository contains installation scripts for setting up an Arch Linux envir
 
 ## Structure
 
-- `packages/` - Scripts for installing system packages via yay (AUR helper)
+- `packages/` - Special-case package installers; plain `yay` packages are declared in `master-installation.sh`
 - `repos/` - Scripts for cloning and setting up personal repositories
 - `hardware/` - Hardware-specific installation scripts (e.g., for MacBook Air)
 - `master-installation.sh` - Main script that runs all installations in order
