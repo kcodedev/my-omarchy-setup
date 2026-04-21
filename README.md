@@ -9,6 +9,7 @@ This repository contains installation scripts for setting up an Arch Linux envir
 - `hardware/` - Hardware-specific installation scripts (e.g., for MacBook Air)
 - `master-installation.sh` - Main script that runs all installations in order
 - `install-hyprland-overrides.sh` - Script to configure Hyprland window manager overrides
+- `install-looknfeel-overrides.sh` - Script to source Omarchy look'n'feel overrides into Hyprland
 
 ## Hyprland Overrides
 
@@ -16,6 +17,7 @@ Hyprland uses a single main configuration file located at `~/.config/hypr/hyprla
 
 In this setup:
 - The [`hyprland-overrides.conf`](hyprland-overrides.conf) file contains custom key bindings and unbindings, such as launching shell scripts with specific key combinations (e.g., `SUPER SHIFT, P` for project launcher) and overriding default bindings (e.g., unbinding `SUPER SHIFT, W` and rebinding it to restart iWD).
+- The [`looknfeel-overrides.conf`](looknfeel-overrides.conf) file re-applies selected Omarchy defaults explicitly, keeping `gaps_in = 0`, `gaps_out = 0`, `border_size = 0`, and `enabled = no` for animations without editing Omarchy's managed `~/.config/hypr/looknfeel.conf` directly.
 - The [`install-hyprland-overrides.sh`](install-hyprland-overrides.sh) script appends a `source` line to the main `hyprland.conf` file, pointing to the overrides file. This ensures the overrides are loaded when Hyprland starts.
 
 When Hyprland reads its config, it processes the `source` directive, merging the contents of the overrides file into the configuration. This approach keeps the base config clean while allowing easy customization and updates to overrides.

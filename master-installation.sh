@@ -171,6 +171,10 @@ doctor() {
         "$HOME/.config/hypr/hyprland.conf" \
         "source = $SCRIPT_DIR/hyprland-overrides.conf"
     report_source_line_status \
+        "looknfeel overrides" \
+        "$HOME/.config/hypr/hyprland.conf" \
+        "source = $SCRIPT_DIR/looknfeel-overrides.conf"
+    report_source_line_status \
         "input overrides" \
         "$HOME/.config/hypr/hyprland.conf" \
         "source = $SCRIPT_DIR/input-overrides.conf"
@@ -207,7 +211,7 @@ perform_install() {
     fi
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
-        step_total=$((step_total + 2))
+        step_total=$((step_total + 3))
     fi
 
     if [ "$include_theme_hook" -eq 1 ]; then
@@ -232,6 +236,7 @@ perform_install() {
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
         run_step "Installing Hyprland overrides" run_script install-hyprland-overrides.sh
+        run_step "Installing look'n'feel overrides" run_script install-looknfeel-overrides.sh
         run_step "Installing input overrides" run_script install-input-overrides.sh
     else
         echo
