@@ -34,6 +34,7 @@ YAY_PACKAGES=(
     glow
     bash-language-server
     models-bin
+    railwayapp-cli
 )
 
 SPECIAL_INSTALL_SCRIPTS=(
