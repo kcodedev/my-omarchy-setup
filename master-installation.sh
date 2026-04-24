@@ -39,7 +39,6 @@ YAY_PACKAGES=(
 
 SPECIAL_INSTALL_SCRIPTS=(
     "packages/install-pipx.sh"
-    "packages/install-kilocode-cli.sh"
 )
 
 step_index=0
