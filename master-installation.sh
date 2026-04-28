@@ -20,8 +20,6 @@ YAY_PACKAGES=(
     visual-studio-code-bin
     cursor-bin
     yazi
-    podman
-    podman-compose
     localsend
     obsidian
     dbeaver
