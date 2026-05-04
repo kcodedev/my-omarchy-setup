@@ -223,29 +223,16 @@ doctor() {
         "$HOME/.config/hypr/hyprland.conf" \
         "source = $SCRIPT_DIR/input-overrides.conf"
     report_brave_vertical_tabs_status
-
-    if [ -x "$HOME/.config/omarchy/hooks/theme-set" ]; then
-        print_status "omarchy theme hook" "installed"
-    elif has_omarchy_install; then
-        print_status "omarchy theme hook" "missing"
-    else
-        print_status "omarchy theme hook" "skipped" "~/.config/omarchy not present"
-    fi
 }
 
 perform_install() {
     local include_hyprland_steps=0
-    local include_theme_hook=0
 
     require_command yay
     require_command git
 
     if has_hyprland_config; then
         include_hyprland_steps=1
-    fi
-
-    if has_omarchy_install; then
-        include_theme_hook=1
     fi
 
     step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 3))
@@ -255,10 +242,6 @@ perform_install() {
     fi
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
-        step_total=$((step_total + 1))
-    fi
-
-    if [ "$include_theme_hook" -eq 1 ]; then
         step_total=$((step_total + 1))
     fi
 
@@ -284,13 +267,6 @@ perform_install() {
     else
         echo
         echo "[skip] Hyprland config not present; skipping Hyprland-specific steps"
-    fi
-
-    if [ "$include_theme_hook" -eq 1 ]; then
-        run_step "Installing Omarchy theme hook" run_script theme-changer/install-omarchy-theme-hook.sh
-    else
-        echo
-        echo "[skip] Omarchy config not present; skipping theme hook"
     fi
 }
 
