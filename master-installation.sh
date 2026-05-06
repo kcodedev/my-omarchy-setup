@@ -150,6 +150,54 @@ report_brave_vertical_tabs_status() {
     fi
 }
 
+report_helix_theme_mapping_status() {
+    local config_file="$HOME/.config/helix/config.toml"
+    local omarchy_theme_file="$HOME/.config/helix/themes/omarchy.toml"
+    local mappings_file="$SCRIPT_DIR/theme-changer/hx-theme-mappings.txt"
+    local mapped_total=0
+    local mapped_installed=0
+    local theme_name
+
+    if ! has_omarchy_install; then
+        print_status "helix theme map" "skipped" "~/.config/omarchy not present"
+        return
+    fi
+
+    if [ -f "$config_file" ] && grep -Eq '^[[:space:]]*theme[[:space:]]*=[[:space:]]*"omarchy"' "$config_file"; then
+        print_status "helix theme" "installed" "theme = omarchy"
+    else
+        print_status "helix theme" "drifted" "$config_file"
+    fi
+
+    if [ -L "$omarchy_theme_file" ] &&
+       [ "$(readlink -f "$omarchy_theme_file")" = "$HOME/.config/omarchy/current/theme/helix.toml" ]; then
+        print_status "helix omarchy link" "installed"
+    else
+        print_status "helix omarchy link" "drifted" "$omarchy_theme_file"
+    fi
+
+    if [ ! -f "$mappings_file" ]; then
+        print_status "helix theme map" "missing" "$mappings_file"
+        return
+    fi
+
+    while IFS='=' read -r theme_name _; do
+        [[ $theme_name =~ ^[[:space:]]*# ]] && continue
+        [[ -z $theme_name ]] && continue
+
+        mapped_total=$((mapped_total + 1))
+        if [ -f "$HOME/.config/omarchy/themes/$theme_name/helix.toml" ]; then
+            mapped_installed=$((mapped_installed + 1))
+        fi
+    done <"$mappings_file"
+
+    if [ "$mapped_total" -gt 0 ] && [ "$mapped_installed" -eq "$mapped_total" ]; then
+        print_status "helix theme map" "installed" "$mapped_installed/$mapped_total overlays"
+    else
+        print_status "helix theme map" "drifted" "$mapped_installed/$mapped_total overlays"
+    fi
+}
+
 report_repo_status() {
     local label="$1"
     local repo_dir="$2"
@@ -223,16 +271,22 @@ doctor() {
         "$HOME/.config/hypr/hyprland.conf" \
         "source = $SCRIPT_DIR/input-overrides.conf"
     report_brave_vertical_tabs_status
+    report_helix_theme_mapping_status
 }
 
 perform_install() {
     local include_hyprland_steps=0
+    local include_helix_theme_mapping=0
 
     require_command yay
     require_command git
 
     if has_hyprland_config; then
         include_hyprland_steps=1
+    fi
+
+    if has_omarchy_install; then
+        include_helix_theme_mapping=1
     fi
 
     step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 3))
@@ -242,6 +296,10 @@ perform_install() {
     fi
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
+        step_total=$((step_total + 1))
+    fi
+
+    if [ "$include_helix_theme_mapping" -eq 1 ]; then
         step_total=$((step_total + 1))
     fi
 
@@ -256,6 +314,12 @@ perform_install() {
     done
     run_step "Syncing shell-scripts repo and wrappers" run_script repos/install-repo-shell-scripts.sh
     run_step "Syncing dotfiles" run_script repos/install-dotfiles.sh
+    if [ "$include_helix_theme_mapping" -eq 1 ]; then
+        run_step "Installing Omarchy Helix theme mappings" run_script theme-changer/install-omarchy-helix-theme-mapping.sh
+    else
+        echo
+        echo "[skip] Omarchy config not present; skipping Helix theme mappings"
+    fi
     run_step "Applying Brave preferences" run_script browsers/apply-brave-preferences.sh
 
     if [ "$MODE" = "install" ] && is_macbook_host; then

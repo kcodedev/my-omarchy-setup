@@ -1,0 +1,24 @@
+# Mappings from Omarchy theme names to Helix built-in theme names.
+# Format: omarchy_theme=helix_theme
+
+catppuccin=catppuccin_mocha
+catppuccin-latte=catppuccin_latte
+everforest=everforest_dark
+flexoki-light=flexoki_light
+gruvbox=gruvbox
+kanagawa=kanagawa
+nord=nord
+rose-pine=rose_pine_dawn
+tokyo-night=tokyonight
+
+# Omarchy themes without a close built-in Helix equivalent.
+ethereal=term16_dark
+hackerman=term16_dark
+lumon=term16_dark
+matte-black=base16_transparent
+miasma=term16_dark
+osaka-jade=term16_dark
+retro-82=term16_dark
+ristretto=term16_dark
+vantablack=base16_transparent
+white=term16_dark
