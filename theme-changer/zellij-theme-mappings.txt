@@ -1,0 +1,26 @@
+# Mappings from Omarchy theme names to Zellij theme names.
+# Format: omarchy_theme=zellij_theme
+# Use Zellij's built-in ansi theme as the generic fallback; it follows the
+# terminal palette better than forcing every unmatched theme through Catppuccin.
+
+catppuccin=catppuccin-mocha
+catppuccin-latte=catppuccin-latte
+flexoki-light=catppuccin-latte
+rose-pine=catppuccin-latte
+
+# Omarchy themes with close built-in Zellij equivalents.
+ethereal=ansi
+everforest=everforest-dark
+gruvbox=gruvbox-dark
+hackerman=ansi
+kanagawa=kanagawa
+lumon=ansi
+matte-black=ansi
+miasma=ansi
+nord=nord
+osaka-jade=ansi
+retro-82=ansi
+ristretto=ansi
+tokyo-night=tokyo-night
+vantablack=ansi
+white=catppuccin-latte
