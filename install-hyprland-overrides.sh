@@ -4,29 +4,44 @@ set -euo pipefail
 
 HYPRLAND_CONFIG="$HOME/.config/hypr/hyprland.conf"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PERSONAL_SOURCE_LINE="source = ~/.config/hypr/personal.conf"
 
-OVERRIDE_CONFIGS=(
-    "$SCRIPT_DIR/hyprland-overrides.conf"
-    "$SCRIPT_DIR/looknfeel-overrides.conf"
-    "$SCRIPT_DIR/input-overrides.conf"
+LEGACY_SOURCE_LINES=(
+    "source = $SCRIPT_DIR/hyprland-overrides.conf"
+    "source = $SCRIPT_DIR/looknfeel-overrides.conf"
+    "source = $SCRIPT_DIR/input-overrides.conf"
 )
 
 ensure_source_line() {
-    local override_config="$1"
-    local source_line="source = $override_config"
-
-    if [ ! -f "$override_config" ]; then
-        echo "Overrides config not found at $override_config"
-        exit 1
-    fi
-
-    if grep -Fxq "$source_line" "$HYPRLAND_CONFIG"; then
-        echo "Source line already exists in $HYPRLAND_CONFIG: $source_line"
+    if grep -Fxq "$PERSONAL_SOURCE_LINE" "$HYPRLAND_CONFIG"; then
+        echo "Source line already exists in $HYPRLAND_CONFIG: $PERSONAL_SOURCE_LINE"
         return
     fi
 
-    echo "Adding source line to $HYPRLAND_CONFIG: $source_line"
-    printf '\n%s\n' "$source_line" >> "$HYPRLAND_CONFIG"
+    echo "Adding source line to $HYPRLAND_CONFIG: $PERSONAL_SOURCE_LINE"
+    printf '\n%s\n' "$PERSONAL_SOURCE_LINE" >> "$HYPRLAND_CONFIG"
+}
+
+remove_legacy_source_lines() {
+    local legacy_source_line
+    local temp_file
+
+    temp_file="$(mktemp)"
+    cp "$HYPRLAND_CONFIG" "$temp_file"
+
+    for legacy_source_line in "${LEGACY_SOURCE_LINES[@]}"; do
+        if grep -Fxq "$legacy_source_line" "$temp_file"; then
+            echo "Removing legacy source line from $HYPRLAND_CONFIG: $legacy_source_line"
+            grep -Fxv "$legacy_source_line" "$temp_file" >"${temp_file}.next"
+            mv "${temp_file}.next" "$temp_file"
+        fi
+    done
+
+    if ! cmp -s "$HYPRLAND_CONFIG" "$temp_file"; then
+        cp "$temp_file" "$HYPRLAND_CONFIG"
+    fi
+
+    rm -f "$temp_file" "${temp_file}.next"
 }
 
 if [ ! -f "$HYPRLAND_CONFIG" ]; then
@@ -35,11 +50,10 @@ if [ ! -f "$HYPRLAND_CONFIG" ]; then
     exit 0
 fi
 
-for override_config in "${OVERRIDE_CONFIGS[@]}"; do
-    ensure_source_line "$override_config"
-done
+remove_legacy_source_lines
+ensure_source_line
 
-echo "Hyprland overrides setup complete!"
+echo "Hyprland personal config source setup complete!"
 
 if command -v hyprctl >/dev/null 2>&1; then
     hyprctl reload >/dev/null 2>&1 || true

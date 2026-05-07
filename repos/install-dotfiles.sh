@@ -2,100 +2,54 @@
 
 set -euo pipefail
 
-ORIGINAL_DIR="$(pwd)"
+REPO_URL="${CHEZMOI_DOTFILES_REPO_URL:-git@github.com:kcodedev/dotfiles-chezmoi.git}"
+SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-$HOME/.local/share/chezmoi}"
 
-REPO_URL="git@github.com:kcodedev/dotfiles.git"
-REPO_NAME="dotfiles"
-REPO_DIR="$HOME/$REPO_NAME"
-BACKUP_DIR="$HOME/.config-backups/dotfiles-$(date +%Y%m%d-%H%M%S)"
+require_command() {
+    local command_name="$1"
 
-update_repo() {
-  if [ -d "$REPO_DIR/.git" ]; then
-    if [ -n "$(git -C "$REPO_DIR" status --porcelain 2>/dev/null)" ]; then
-      echo "Repository '$REPO_NAME' has local changes. Skipping pull"
-    else
-      echo "Updating repository '$REPO_NAME'"
-      git -C "$REPO_DIR" pull --ff-only
+    if ! command -v "$command_name" >/dev/null 2>&1; then
+        echo "Missing required command: $command_name"
+        exit 1
     fi
-  elif [ -d "$REPO_DIR" ]; then
-    echo "Path exists but is not a git repository: $REPO_DIR"
-    exit 1
-  else
-    git clone "$REPO_URL"
-  fi
 }
 
-package_targets() {
-  find "$REPO_DIR" -mindepth 1 -maxdepth 1 -type d ! -name '.git' -printf '%f\n' | sort
+source_has_changes() {
+    [ -n "$(git -C "$SOURCE_DIR" status --porcelain 2>/dev/null)" ]
 }
 
-backup_package_targets() {
-  local package="$1"
-  local entry
-  local child
-
-  while IFS= read -r entry; do
-    [ -n "$entry" ] || continue
-
-    if [ "$entry" = ".config" ] && [ -d "$package/.config" ]; then
-      while IFS= read -r child; do
-        [ -n "$child" ] || continue
-        backup_path "$HOME/.config/$child"
-      done < <(find "$package/.config" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)
-    else
-      backup_path "$HOME/$entry"
-    fi
-  done < <(find "$package" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)
-}
-
-backup_path() {
-  local target="$1"
-  local backup_target
-  local resolved_target
-
-  if [ ! -e "$target" ] && [ ! -L "$target" ]; then
-    return 0
-  fi
-
-  if [ -L "$target" ]; then
-    resolved_target="$(readlink -f "$target" 2>/dev/null || true)"
-
-    case "$resolved_target" in
-      "$REPO_DIR"/*)
-        echo "Skipping managed symlink: $target"
+init_source() {
+    if [ -d "$SOURCE_DIR/.git" ]; then
         return 0
-        ;;
-    esac
-  fi
+    fi
 
-  backup_target="$BACKUP_DIR/${target#$HOME/}"
-  mkdir -p "$(dirname "$backup_target")"
-  mv "$target" "$backup_target"
-  echo "Backed up $target to $backup_target"
+    if [ -e "$SOURCE_DIR" ]; then
+        echo "Chezmoi source path exists but is not a git repository: $SOURCE_DIR"
+        exit 1
+    fi
+
+    echo "Initializing chezmoi source from $REPO_URL"
+    chezmoi init --source "$SOURCE_DIR" "$REPO_URL"
 }
 
-if ! pacman -Qi stow >/dev/null 2>&1; then
-  echo "Install stow first"
-  exit 1
-fi
+update_source() {
+    if source_has_changes; then
+        echo "Chezmoi source has local changes. Skipping pull: $SOURCE_DIR"
+        return 0
+    fi
 
-cd "$HOME"
+    echo "Updating chezmoi source"
+    git -C "$SOURCE_DIR" pull --ff-only
+}
 
-update_repo
+apply_dotfiles() {
+    echo "Applying chezmoi-managed dotfiles"
+    chezmoi --source "$SOURCE_DIR" apply --verbose
+}
 
-cd "$REPO_DIR"
+require_command git
+require_command chezmoi
 
-mapfile -t packages < <(package_targets)
-
-if [ "${#packages[@]}" -eq 0 ]; then
-  echo "No stow packages found in $REPO_DIR"
-  exit 1
-fi
-
-for package in "${packages[@]}"; do
-  backup_package_targets "$package"
-done
-
-stow -t "$HOME" "${packages[@]}"
-
-cd "$ORIGINAL_DIR"
+init_source
+update_source
+apply_dotfiles

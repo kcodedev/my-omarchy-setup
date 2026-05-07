@@ -10,7 +10,7 @@ PRODUCT_NAME="$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "Unknown"
 
 YAY_PACKAGES=(
     jq
-    stow
+    chezmoi
     helix
     keepassxc
     brave-bin
@@ -273,6 +273,23 @@ report_source_line_status() {
     fi
 }
 
+report_absent_source_line_status() {
+    local label="$1"
+    local target_file="$2"
+    local source_line="$3"
+
+    if [ ! -f "$target_file" ]; then
+        print_status "$label" "skipped" "$target_file not present"
+        return
+    fi
+
+    if grep -Fxq "$source_line" "$target_file"; then
+        print_status "$label" "present" "$source_line"
+    else
+        print_status "$label" "absent"
+    fi
+}
+
 doctor() {
     echo "Setup doctor"
     echo "Mode: inspect-only"
@@ -281,7 +298,7 @@ doctor() {
     print_status "host" "$(if is_macbook_host; then echo macbook; else echo generic; fi)" "$PRODUCT_NAME"
     report_command_status yay
     report_command_status git
-    report_command_status stow
+    report_command_status chezmoi
     report_command_status npm
     report_command_status pipx
     report_command_status jq
@@ -292,19 +309,23 @@ doctor() {
         print_status "PATH ~/.local/bin" "missing"
     fi
 
-    report_repo_status "dotfiles repo" "$HOME/dotfiles"
+    report_repo_status "chezmoi source" "$HOME/.local/share/chezmoi"
     report_repo_status "shell-scripts repo" "$HOME/Repos/shell-scripts"
 
     report_source_line_status \
-        "hypr overrides" \
+        "hypr personal" \
+        "$HOME/.config/hypr/hyprland.conf" \
+        "source = ~/.config/hypr/personal.conf"
+    report_absent_source_line_status \
+        "hypr legacy source" \
         "$HOME/.config/hypr/hyprland.conf" \
         "source = $SCRIPT_DIR/hyprland-overrides.conf"
-    report_source_line_status \
-        "looknfeel overrides" \
+    report_absent_source_line_status \
+        "looknfeel legacy" \
         "$HOME/.config/hypr/hyprland.conf" \
         "source = $SCRIPT_DIR/looknfeel-overrides.conf"
-    report_source_line_status \
-        "input overrides" \
+    report_absent_source_line_status \
+        "input legacy" \
         "$HOME/.config/hypr/hyprland.conf" \
         "source = $SCRIPT_DIR/input-overrides.conf"
     report_brave_vertical_tabs_status
@@ -366,7 +387,7 @@ perform_install() {
     fi
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
-        run_step "Installing Hyprland source overrides" run_script install-hyprland-overrides.sh
+        run_step "Installing Hyprland personal config source" run_script install-hyprland-overrides.sh
     else
         echo
         echo "[skip] Hyprland config not present; skipping Hyprland-specific steps"
