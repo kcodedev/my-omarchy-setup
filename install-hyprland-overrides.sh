@@ -4,6 +4,7 @@ set -euo pipefail
 
 HYPRLAND_CONFIG="$HOME/.config/hypr/hyprland.conf"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PERSONAL_CONFIG="$HOME/.config/hypr/personal.conf"
 PERSONAL_SOURCE_LINE="source = ~/.config/hypr/personal.conf"
 
 LEGACY_SOURCE_LINES=(
@@ -13,6 +14,12 @@ LEGACY_SOURCE_LINES=(
 )
 
 ensure_source_line() {
+    if [ ! -f "$PERSONAL_CONFIG" ]; then
+        echo "Personal Hyprland config not found at $PERSONAL_CONFIG"
+        echo "Skipping personal source line"
+        return
+    fi
+
     if grep -Fxq "$PERSONAL_SOURCE_LINE" "$HYPRLAND_CONFIG"; then
         echo "Source line already exists in $HYPRLAND_CONFIG: $PERSONAL_SOURCE_LINE"
         return
@@ -53,7 +60,7 @@ fi
 remove_legacy_source_lines
 ensure_source_line
 
-echo "Hyprland personal config source setup complete!"
+echo "Hyprland override source setup complete!"
 
 if command -v hyprctl >/dev/null 2>&1; then
     hyprctl reload >/dev/null 2>&1 || true
