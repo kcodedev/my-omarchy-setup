@@ -27,8 +27,9 @@ Chezmoi manages the personal fragments from `~/.local/share/chezmoi`:
 - `dot_config/hypr/common.conf` contains shared bindings, window rules, gaps, borders, and animation preferences.
 - `dot_config/hypr/laptop.conf` contains laptop monitor, scaling, and touchpad input settings.
 - `dot_config/hypr/desktop.conf` is reserved for desktop monitor and input assumptions.
+- `dot_config/waybar/config.jsonc` contains personal Waybar overrides, including workspace icons.
 
-The [`install-hyprland-overrides.sh`](install-hyprland-overrides.sh) script removes legacy setup-repo override source lines and adds the single `personal.conf` line if needed. The old setup-repo override files are no longer sourced directly.
+The [`install-hyprland-overrides.sh`](install-hyprland-overrides.sh) script removes legacy setup-repo override source lines and adds the single `personal.conf` line if needed. The old setup-repo override files are no longer sourced directly and have been removed from this repository.
 
 ## Usage
 
