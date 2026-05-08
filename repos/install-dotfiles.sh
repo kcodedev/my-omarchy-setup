@@ -47,9 +47,24 @@ apply_dotfiles() {
     chezmoi --source "$SOURCE_DIR" apply --verbose
 }
 
+refresh_desktop_launchers() {
+    local applications_dir="$HOME/.local/share/applications"
+
+    if [ -d "$applications_dir" ] && command -v update-desktop-database >/dev/null 2>&1; then
+        echo "Updating local desktop application database"
+        update-desktop-database "$applications_dir" || true
+    fi
+
+    if command -v omarchy-restart-walker >/dev/null 2>&1; then
+        echo "Restarting Walker"
+        omarchy-restart-walker || true
+    fi
+}
+
 require_command git
 require_command chezmoi
 
 init_source
 update_source
 apply_dotfiles
+refresh_desktop_launchers
