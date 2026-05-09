@@ -14,6 +14,7 @@ OLD_HOOK_FILE="$HOME/.config/omarchy/hooks/theme-set"
 OLD_ORIGINAL_HOOK_FILE="$HOME/.config/omarchy/hooks/theme-set.original"
 OLD_MANAGED_MARKER="# managed by my-omarchy-setup"
 OLD_UPDATER_PATH="$SCRIPT_DIR/update-helix-theme.sh"
+UPDATER_PATH="$SCRIPT_DIR/update-helix-theme.sh"
 
 if [ ! -f "$MAPPINGS_FILE" ]; then
     echo "Missing Helix theme mappings: $MAPPINGS_FILE"
@@ -43,6 +44,30 @@ restore_stale_theme_hook() {
         rm "$OLD_HOOK_FILE"
         echo "Removed stale Omarchy theme hook"
     fi
+}
+
+remove_stale_helix_hook_call() {
+    local temp_file
+
+    if [ ! -f "$OLD_HOOK_FILE" ]; then
+        return
+    fi
+
+    if ! grep -Fq "$OLD_UPDATER_PATH" "$OLD_HOOK_FILE"; then
+        return
+    fi
+
+    temp_file="$(mktemp)"
+    grep -Fv "$OLD_UPDATER_PATH" "$OLD_HOOK_FILE" >"$temp_file" || true
+
+    if grep -Eqv '^[[:space:]]*(#.*)?$|^[[:space:]]*set -euo pipefail[[:space:]]*$|^[[:space:]]*#!/bin/(ba)?sh[[:space:]]*$' "$temp_file"; then
+        mv "$temp_file" "$OLD_HOOK_FILE"
+        chmod +x "$OLD_HOOK_FILE"
+    else
+        rm -f "$OLD_HOOK_FILE" "$temp_file"
+    fi
+
+    echo "Removed stale Helix theme hook call"
 }
 
 write_helix_config_theme() {
@@ -77,10 +102,10 @@ write_theme_overlays() {
 }
 
 restore_stale_theme_hook
+remove_stale_helix_hook_call
 
-ln -sf "$CURRENT_THEME_DIR/helix.toml" "$HELIX_OMARCHY_THEME"
-write_helix_config_theme
-write_theme_overlays
+chmod +x "$UPDATER_PATH"
+"$UPDATER_PATH"
 
 if command -v omarchy-theme-refresh >/dev/null 2>&1 &&
    [ -f "$HOME/.config/omarchy/current/theme.name" ]; then
