@@ -14,7 +14,6 @@ YAY_PACKAGES=(
     helix
     keepassxc
     brave-bin
-    zellij
     tmux
     kitty
     visual-studio-code-bin
@@ -198,43 +197,6 @@ report_helix_theme_mapping_status() {
     fi
 }
 
-report_zellij_theme_mapping_status() {
-    local config_file="$HOME/.config/zellij/config.kdl"
-    local theme_file="$HOME/.config/zellij/themes/catppuccin.kdl"
-    local mappings_file="$SCRIPT_DIR/theme-changer/zellij-theme-mappings.txt"
-    local hook_file="$HOME/.config/omarchy/hooks/theme-set"
-    local updater_path="$SCRIPT_DIR/theme-changer/update-zellij-theme.sh"
-
-    if ! has_omarchy_install; then
-        print_status "zellij theme map" "skipped" "~/.config/omarchy not present"
-        return
-    fi
-
-    if [ -f "$theme_file" ]; then
-        print_status "zellij themes" "installed" "$theme_file"
-    else
-        print_status "zellij themes" "drifted" "$theme_file"
-    fi
-
-    if [ -f "$config_file" ] && grep -Eq '^[[:space:]]*theme[[:space:]]+"(default|ansi|catppuccin-(latte|frappe|macchiato|mocha)|everforest-(dark|light)|gruvbox-(dark|light)|kanagawa|nord|tokyo-night)"' "$config_file"; then
-        print_status "zellij theme" "installed"
-    else
-        print_status "zellij theme" "drifted" "$config_file"
-    fi
-
-    if [ -f "$hook_file" ] && grep -Fq "$updater_path" "$hook_file"; then
-        print_status "zellij theme hook" "installed"
-    else
-        print_status "zellij theme hook" "drifted" "$hook_file"
-    fi
-
-    if [ -f "$mappings_file" ]; then
-        print_status "zellij theme map" "installed" "$mappings_file"
-    else
-        print_status "zellij theme map" "missing" "$mappings_file"
-    fi
-}
-
 report_repo_status() {
     local label="$1"
     local repo_dir="$2"
@@ -330,7 +292,6 @@ doctor() {
         "source = $SCRIPT_DIR/input-overrides.conf"
     report_brave_vertical_tabs_status
     report_helix_theme_mapping_status
-    report_zellij_theme_mapping_status
 }
 
 perform_install() {
@@ -359,7 +320,7 @@ perform_install() {
     fi
 
     if [ "$include_helix_theme_mapping" -eq 1 ]; then
-        step_total=$((step_total + 2))
+        step_total=$((step_total + 1))
     fi
 
     echo "Setup mode: $MODE"
@@ -375,10 +336,9 @@ perform_install() {
     run_step "Syncing dotfiles" run_script repos/install-dotfiles.sh
     if [ "$include_helix_theme_mapping" -eq 1 ]; then
         run_step "Installing Omarchy Helix theme mappings" run_script theme-changer/install-omarchy-helix-theme-mapping.sh
-        run_step "Installing Omarchy Zellij theme mappings" run_script theme-changer/install-omarchy-zellij-theme-mapping.sh
     else
         echo
-        echo "[skip] Omarchy config not present; skipping Helix and Zellij theme mappings"
+        echo "[skip] Omarchy config not present; skipping Helix theme mappings"
     fi
     run_step "Applying Brave preferences" run_script browsers/apply-brave-preferences.sh
 
