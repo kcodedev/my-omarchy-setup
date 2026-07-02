@@ -149,6 +149,29 @@ report_brave_vertical_tabs_status() {
     fi
 }
 
+report_brave_extension_policy_status() {
+    local policy_file="/etc/brave/policies/managed/extensions.json"
+    local vimium_policy="dbepggeogbaibhgnhhndojpepiihcmeb;https://clients2.google.com/service/update2/crx"
+
+    if [ ! -f "$policy_file" ]; then
+        print_status "brave extensions" "missing" "$policy_file not present"
+        return
+    fi
+
+    if ! command -v jq >/dev/null 2>&1; then
+        print_status "brave extensions" "unknown" "jq not installed"
+        return
+    fi
+
+    if jq -e --arg vimium_policy "$vimium_policy" \
+        '.ExtensionInstallForcelist // [] | index($vimium_policy)' \
+        "$policy_file" >/dev/null 2>&1; then
+        print_status "brave extensions" "installed" "Vimium"
+    else
+        print_status "brave extensions" "drifted" "$policy_file"
+    fi
+}
+
 report_helix_theme_mapping_status() {
     local config_file="$HOME/.config/helix/config.toml"
     local omarchy_theme_file="$HOME/.config/helix/themes/omarchy.toml"
@@ -291,6 +314,7 @@ doctor() {
         "$HOME/.config/hypr/hyprland.conf" \
         "source = $SCRIPT_DIR/input-overrides.conf"
     report_brave_vertical_tabs_status
+    report_brave_extension_policy_status
     report_helix_theme_mapping_status
 }
 
@@ -309,7 +333,7 @@ perform_install() {
         include_helix_theme_mapping=1
     fi
 
-    step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 3))
+    step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 4))
 
     if [ "$MODE" = "install" ] && is_macbook_host; then
         step_total=$((step_total + 1))
@@ -341,6 +365,7 @@ perform_install() {
         echo "[skip] Omarchy config not present; skipping Helix theme mappings"
     fi
     run_step "Applying Brave preferences" run_script browsers/apply-brave-preferences.sh
+    run_step "Applying Brave managed policies" run_script browsers/apply-brave-policies.sh
 
     if [ "$MODE" = "install" ] && is_macbook_host; then
         run_step "Running MacBook hardware extras" run_script hardware/install-macbook-air.sh

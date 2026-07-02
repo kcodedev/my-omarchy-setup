@@ -70,7 +70,7 @@ than host-specific templates.
 - `install` auto-detects MacBook hardware and runs the hardware extras for that host
 - `sync` updates existing repos with `git pull --ff-only` when they are clean, and skips pulling if you have local changes
 - `sync` applies dotfiles with chezmoi from `~/.local/share/chezmoi`
-- Brave preferences are re-applied during install/sync for repo-managed defaults such as vertical tabs
+- Brave preferences and managed policies are re-applied during install/sync for repo-managed defaults such as vertical tabs and force-installed extensions
 - `doctor` reports command availability, repo state, Hyprland personal config status, and Omarchy hook status
 - `master-cleanup.sh` runs the repo cleanup scripts without mixing removals into install/sync
 - Hyprland-specific steps now skip cleanly when `~/.config/hypr/hyprland.conf` is not present
