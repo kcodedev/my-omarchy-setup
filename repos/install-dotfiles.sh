@@ -55,10 +55,8 @@ refresh_desktop_launchers() {
         update-desktop-database "$applications_dir" || true
     fi
 
-    if command -v omarchy-restart-walker >/dev/null 2>&1; then
-        echo "Restarting Walker"
-        omarchy-restart-walker || true
-    fi
+    # Omarchy 4's Quickshell application model watches desktop-entry changes.
+    # Walker is no longer part of the desktop and does not need restarting.
 }
 
 require_command git

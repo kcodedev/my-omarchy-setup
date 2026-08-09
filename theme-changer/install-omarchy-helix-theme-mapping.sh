@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MAPPINGS_FILE="$SCRIPT_DIR/hx-theme-mappings.txt"
 OMARCHY_THEMES_DIR="$HOME/.config/omarchy/themes"
-CURRENT_THEME_DIR="$HOME/.config/omarchy/current/theme"
+CURRENT_THEME_DIR="$HOME/.local/state/omarchy/current/theme"
 HELIX_CONFIG_DIR="$HOME/.config/helix"
 HELIX_CONFIG_FILE="$HELIX_CONFIG_DIR/config.toml"
 HELIX_THEMES_DIR="$HELIX_CONFIG_DIR/themes"
@@ -108,7 +108,7 @@ chmod +x "$UPDATER_PATH"
 "$UPDATER_PATH"
 
 if command -v omarchy-theme-refresh >/dev/null 2>&1 &&
-   [ -f "$HOME/.config/omarchy/current/theme.name" ]; then
+   [ -f "$HOME/.local/state/omarchy/current/theme.name" ]; then
     omarchy-theme-refresh
 fi
 

@@ -11,25 +11,51 @@ This repository contains installation scripts for setting up an Arch Linux envir
 - `hardware/` - Hardware-specific installation scripts (e.g., for MacBook Air)
 - `master-installation.sh` - Main script that runs all installations in order
 - `master-cleanup.sh` - Main script that runs the repo cleanup scripts in one pass
-- `install-hyprland-overrides.sh` - Script to source chezmoi-managed personal Hyprland config from Omarchy's `hyprland.conf`
+- `install-hyprland-overrides.sh` - Validates Omarchy 4's Hyprland Lua entrypoint and user-module imports
 
 ## Hyprland Personal Config
 
-Hyprland uses a single main configuration file at `~/.config/hypr/hyprland.conf`. Omarchy owns that file, so this setup keeps the Omarchy file intact and only ensures it contains one stable personal source line:
+Omarchy 4 configures Hyprland in Lua. The active entrypoint is
+`~/.config/hypr/hyprland.lua`, which loads Omarchy's defaults followed by these
+user-owned modules:
 
-```conf
-source = ~/.config/hypr/personal.conf
+```lua
+require("hypr.monitors")
+require("hypr.input")
+require("hypr.bindings")
+require("hypr.looknfeel")
+require("hypr.autostart")
 ```
 
-Chezmoi manages the personal fragments from `~/.local/share/chezmoi`:
+Personal Hyprland settings belong in the corresponding `.lua` files under
+`~/.config/hypr/`. The chezmoi source repository must therefore manage:
 
-- `dot_config/hypr/personal.conf.tmpl` always sources `common.conf` and chooses host-specific fragments by hostname.
-- `dot_config/hypr/common.conf` contains shared bindings, window rules, gaps, borders, and animation preferences.
-- `dot_config/hypr/laptop.conf` contains laptop monitor, scaling, and touchpad input settings.
-- `dot_config/hypr/desktop.conf` is reserved for desktop monitor and input assumptions.
-- `dot_config/waybar/config.jsonc` contains personal Waybar overrides, including workspace icons.
+- `dot_config/hypr/bindings.lua` for `hl.unbind(...)` and `o.bind(...)` calls
+- `dot_config/hypr/monitors.lua` for `hl.env(...)` and `hl.monitor(...)` calls
+- `dot_config/hypr/input.lua` for `hl.config({ input = ... })`
+- `dot_config/hypr/looknfeel.lua` for gaps, borders, and animation settings
+- `dot_config/hypr/hyprland.lua` only when the stock Omarchy entrypoint itself needs changing
 
-The [`install-hyprland-overrides.sh`](install-hyprland-overrides.sh) script removes legacy setup-repo override source lines and adds the single `personal.conf` line if needed. The old setup-repo override files are no longer sourced directly and have been removed from this repository.
+Legacy `personal.conf`, `common.conf`, and host `.conf` fragments are not loaded
+by the Lua entrypoint. The [`install-hyprland-overrides.sh`](install-hyprland-overrides.sh)
+script verifies the Lua bootstrap/imports and checks a live Hyprland session for
+configuration errors; it no longer edits the inactive `.conf` stub.
+
+## Quickshell
+
+Omarchy 4 replaced Waybar and Walker with the Omarchy shell built on Quickshell.
+Bar layout and built-in widgets are configured by
+`~/.config/omarchy/shell.json`; personal plugin code belongs under
+`~/.config/omarchy/plugins/`. A chezmoi-managed `dot_config/waybar/` directory
+has no effect on the Omarchy 4 bar.
+
+Common Waybar migrations are:
+
+- `mpris` -> add `{ "id": "omarchy.media" }` to a `bar.layout` section
+- workspace numbers -> the built-in `{ "id": "omarchy.workspaces" }`
+- custom workspace icons -> clone `omarchy.workspaces` and customize the user-owned QML plugin
+- battery percentage -> use the `omarchy.power` widget (right-click toggles percentage)
+- launcher refresh -> no Walker restart; Quickshell watches desktop entries
 
 ## Usage
 
@@ -71,9 +97,9 @@ than host-specific templates.
 - `sync` updates existing repos with `git pull --ff-only` when they are clean, and skips pulling if you have local changes
 - `sync` applies dotfiles with chezmoi from `~/.local/share/chezmoi`
 - Brave preferences and managed policies are re-applied during install/sync for repo-managed defaults such as vertical tabs and force-installed extensions
-- `doctor` reports command availability, repo state, Hyprland personal config status, and Omarchy hook status
+- `doctor` reports command availability, repo state, Hyprland Lua module status, and Omarchy hook status
 - `master-cleanup.sh` runs the repo cleanup scripts without mixing removals into install/sync
-- Hyprland-specific steps now skip cleanly when `~/.config/hypr/hyprland.conf` is not present
+- Hyprland-specific steps skip cleanly when `~/.config/hypr/hyprland.lua` is not present
 - npm and pipx tools are only upgraded when `BOOTSTRAP_UPGRADE=1` is set
 - Hardware-specific scripts include detection to prevent running on incompatible systems
 - Reboot recommended after installing kernel modules (e.g., FacetimeHD)

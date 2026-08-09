@@ -7,8 +7,8 @@ PACKAGES=(
     1password-beta
     1password-cli
 )
-BINDINGS_FILE="$HOME/.config/hypr/bindings.conf"
-PASSWORDS_BINDING='bindd = SUPER SHIFT, SLASH, Passwords, exec, uwsm-app -- 1password'
+BINDINGS_FILE="$HOME/.config/hypr/bindings.lua"
+PASSWORDS_UNBIND='hl.unbind("SUPER + SHIFT + SLASH")'
 
 usage() {
     cat <<'EOF'
@@ -30,26 +30,23 @@ remove_package_if_installed() {
     fi
 }
 
-remove_hypr_binding() {
+ensure_hypr_unbind() {
     local target_file="$1"
-    local binding_line="$2"
-    local tmp_file
+    local unbind_line="$2"
 
     if [ ! -f "$target_file" ]; then
         echo "Hyprland bindings file not found: $target_file"
         return
     fi
 
-    if ! grep -Fxq "$binding_line" "$target_file"; then
-        echo "1Password Hyprland binding already absent"
+    if grep -Fxq "$unbind_line" "$target_file"; then
+        echo "1Password Hyprland binding already disabled"
         return
     fi
 
-    tmp_file="$(mktemp)"
-    grep -Fvx "$binding_line" "$target_file" > "$tmp_file"
     cp "$target_file" "$target_file.bak"
-    mv "$tmp_file" "$target_file"
-    echo "Removed 1Password binding from $target_file"
+    printf '\n-- Disable Omarchy\047s packaged 1Password binding.\n%s\n' "$unbind_line" >>"$target_file"
+    echo "Disabled the 1Password binding in $target_file"
 }
 
 for arg in "$@"; do
@@ -73,10 +70,15 @@ for package_name in "${PACKAGES[@]}"; do
     remove_package_if_installed "$package_name"
 done
 
-remove_hypr_binding "$BINDINGS_FILE" "$PASSWORDS_BINDING"
+ensure_hypr_unbind "$BINDINGS_FILE" "$PASSWORDS_UNBIND"
 
-if command -v hyprctl >/dev/null 2>&1; then
-    hyprctl reload >/dev/null 2>&1 || true
+if command -v hyprctl >/dev/null 2>&1 && hyprctl reload >/dev/null 2>&1; then
+    config_errors="$(hyprctl configerrors 2>/dev/null || true)"
+    if [ -n "$config_errors" ]; then
+        echo "Hyprland configuration errors:" >&2
+        printf '%s\n' "$config_errors" >&2
+        exit 1
+    fi
 fi
 
 if [ "$PURGE_DATA" -ne 1 ]; then

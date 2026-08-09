@@ -23,7 +23,6 @@ YAY_PACKAGES=(
     obsidian
     dbeaver
     dropbox-cli
-    fuzzel
     cava
     lazygit
     nodejs
@@ -80,7 +79,7 @@ run_step() {
 }
 
 has_hyprland_config() {
-    [ -f "$HOME/.config/hypr/hyprland.conf" ]
+    [ -f "$HOME/.config/hypr/hyprland.lua" ]
 }
 
 has_omarchy_install() {
@@ -192,7 +191,7 @@ report_helix_theme_mapping_status() {
     fi
 
     if [ -L "$omarchy_theme_file" ] &&
-       [ "$(readlink -f "$omarchy_theme_file")" = "$HOME/.config/omarchy/current/theme/helix.toml" ]; then
+       [ "$(readlink -f "$omarchy_theme_file")" = "$HOME/.local/state/omarchy/current/theme/helix.toml" ]; then
         print_status "helix omarchy link" "installed"
     else
         print_status "helix omarchy link" "drifted" "$omarchy_theme_file"
@@ -258,23 +257,6 @@ report_source_line_status() {
     fi
 }
 
-report_absent_source_line_status() {
-    local label="$1"
-    local target_file="$2"
-    local source_line="$3"
-
-    if [ ! -f "$target_file" ]; then
-        print_status "$label" "skipped" "$target_file not present"
-        return
-    fi
-
-    if grep -Fxq "$source_line" "$target_file"; then
-        print_status "$label" "present" "$source_line"
-    else
-        print_status "$label" "absent"
-    fi
-}
-
 doctor() {
     echo "Setup doctor"
     echo "Mode: inspect-only"
@@ -298,21 +280,25 @@ doctor() {
     report_repo_status "shell-scripts repo" "$HOME/Repos/shell-scripts"
 
     report_source_line_status \
-        "hypr personal" \
-        "$HOME/.config/hypr/hyprland.conf" \
-        "source = ~/.config/hypr/personal.conf"
-    report_absent_source_line_status \
-        "hypr legacy source" \
-        "$HOME/.config/hypr/hyprland.conf" \
-        "source = $SCRIPT_DIR/hyprland-overrides.conf"
-    report_absent_source_line_status \
-        "looknfeel legacy" \
-        "$HOME/.config/hypr/hyprland.conf" \
-        "source = $SCRIPT_DIR/looknfeel-overrides.conf"
-    report_absent_source_line_status \
-        "input legacy" \
-        "$HOME/.config/hypr/hyprland.conf" \
-        "source = $SCRIPT_DIR/input-overrides.conf"
+        "hypr lua bootstrap" \
+        "$HOME/.config/hypr/hyprland.lua" \
+        'dofile((os.getenv("OMARCHY_PATH") or "/usr/share/omarchy") .. "/default/hypr/bootstrap.lua")'
+    report_source_line_status \
+        "hypr monitors lua" \
+        "$HOME/.config/hypr/hyprland.lua" \
+        'require("hypr.monitors")'
+    report_source_line_status \
+        "hypr input lua" \
+        "$HOME/.config/hypr/hyprland.lua" \
+        'require("hypr.input")'
+    report_source_line_status \
+        "hypr bindings lua" \
+        "$HOME/.config/hypr/hyprland.lua" \
+        'require("hypr.bindings")'
+    report_source_line_status \
+        "hypr looknfeel lua" \
+        "$HOME/.config/hypr/hyprland.lua" \
+        'require("hypr.looknfeel")'
     report_brave_vertical_tabs_status
     report_brave_extension_policy_status
     report_helix_theme_mapping_status
@@ -372,7 +358,7 @@ perform_install() {
     fi
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
-        run_step "Installing Hyprland personal config source" run_script install-hyprland-overrides.sh
+        run_step "Validating Hyprland Lua configuration" run_script install-hyprland-overrides.sh
     else
         echo
         echo "[skip] Hyprland config not present; skipping Hyprland-specific steps"

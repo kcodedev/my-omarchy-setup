@@ -2,66 +2,53 @@
 
 set -euo pipefail
 
-HYPRLAND_CONFIG="$HOME/.config/hypr/hyprland.conf"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PERSONAL_CONFIG="$HOME/.config/hypr/personal.conf"
-PERSONAL_SOURCE_LINE="source = ~/.config/hypr/personal.conf"
-
-LEGACY_SOURCE_LINES=(
-    "source = $SCRIPT_DIR/hyprland-overrides.conf"
-    "source = $SCRIPT_DIR/looknfeel-overrides.conf"
-    "source = $SCRIPT_DIR/input-overrides.conf"
+HYPRLAND_CONFIG="$HOME/.config/hypr/hyprland.lua"
+REQUIRED_MODULES=(
+    "hypr.monitors"
+    "hypr.input"
+    "hypr.bindings"
+    "hypr.looknfeel"
+    "hypr.autostart"
 )
 
-ensure_source_line() {
-    if [ ! -f "$PERSONAL_CONFIG" ]; then
-        echo "Personal Hyprland config not found at $PERSONAL_CONFIG"
-        echo "Skipping personal source line"
-        return
-    fi
-
-    if grep -Fxq "$PERSONAL_SOURCE_LINE" "$HYPRLAND_CONFIG"; then
-        echo "Source line already exists in $HYPRLAND_CONFIG: $PERSONAL_SOURCE_LINE"
-        return
-    fi
-
-    echo "Adding source line to $HYPRLAND_CONFIG: $PERSONAL_SOURCE_LINE"
-    printf '\n%s\n' "$PERSONAL_SOURCE_LINE" >> "$HYPRLAND_CONFIG"
-}
-
-remove_legacy_source_lines() {
-    local legacy_source_line
-    local temp_file
-
-    temp_file="$(mktemp)"
-    cp "$HYPRLAND_CONFIG" "$temp_file"
-
-    for legacy_source_line in "${LEGACY_SOURCE_LINES[@]}"; do
-        if grep -Fxq "$legacy_source_line" "$temp_file"; then
-            echo "Removing legacy source line from $HYPRLAND_CONFIG: $legacy_source_line"
-            grep -Fxv "$legacy_source_line" "$temp_file" >"${temp_file}.next"
-            mv "${temp_file}.next" "$temp_file"
-        fi
-    done
-
-    if ! cmp -s "$HYPRLAND_CONFIG" "$temp_file"; then
-        cp "$temp_file" "$HYPRLAND_CONFIG"
-    fi
-
-    rm -f "$temp_file" "${temp_file}.next"
-}
-
 if [ ! -f "$HYPRLAND_CONFIG" ]; then
-    echo "Hyprland config not found at $HYPRLAND_CONFIG"
-    echo "Skipping Hyprland overrides"
+    echo "Hyprland Lua config not found at $HYPRLAND_CONFIG"
+    echo "Skipping Hyprland validation"
     exit 0
 fi
 
-remove_legacy_source_lines
-ensure_source_line
+if ! grep -Fq '/default/hypr/bootstrap.lua' "$HYPRLAND_CONFIG"; then
+    echo "Hyprland Lua config does not load Omarchy's bootstrap: $HYPRLAND_CONFIG" >&2
+    echo "Run 'omarchy refresh config hypr/hyprland.lua', then re-apply your personal Lua modules." >&2
+    exit 1
+fi
 
-echo "Hyprland override source setup complete!"
+missing_modules=()
+for module in "${REQUIRED_MODULES[@]}"; do
+    if ! grep -Fq "require(\"$module\")" "$HYPRLAND_CONFIG"; then
+        missing_modules+=("$module")
+    fi
+done
+
+if [ "${#missing_modules[@]}" -gt 0 ]; then
+    echo "Hyprland Lua config is missing Omarchy user-module imports:" >&2
+    printf '  require("%s")\n' "${missing_modules[@]}" >&2
+    echo "Refresh the entrypoint with 'omarchy refresh config hypr/hyprland.lua'." >&2
+    exit 1
+fi
+
+echo "Hyprland Lua entrypoint is configured for Omarchy 4"
 
 if command -v hyprctl >/dev/null 2>&1; then
-    hyprctl reload >/dev/null 2>&1 || true
+    if hyprctl reload >/dev/null 2>&1; then
+        config_errors="$(hyprctl configerrors 2>/dev/null || true)"
+        if [ -n "$config_errors" ]; then
+            echo "Hyprland configuration errors:" >&2
+            printf '%s\n' "$config_errors" >&2
+            exit 1
+        fi
+        echo "Hyprland configuration reloaded without errors"
+    else
+        echo "Hyprland is not reachable; skipped live reload validation"
+    fi
 fi
