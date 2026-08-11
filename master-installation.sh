@@ -174,7 +174,7 @@ report_brave_extension_policy_status() {
 report_helix_theme_mapping_status() {
     local config_file="$HOME/.config/helix/config.toml"
     local omarchy_theme_file="$HOME/.config/helix/themes/omarchy.toml"
-    local mappings_file="$SCRIPT_DIR/theme-changer/hx-theme-mappings.txt"
+    local mappings_file="$SCRIPT_DIR/helix-theme-mapping/hx-theme-mappings.txt"
     local mapped_total=0
     local mapped_installed=0
     local theme_name
@@ -345,7 +345,7 @@ perform_install() {
     run_step "Syncing shell-scripts repo and wrappers" run_script repos/install-repo-shell-scripts.sh
     run_step "Syncing dotfiles" run_script repos/install-dotfiles.sh
     if [ "$include_helix_theme_mapping" -eq 1 ]; then
-        run_step "Installing Omarchy Helix theme mappings" run_script theme-changer/install-omarchy-helix-theme-mapping.sh
+        run_step "Installing Omarchy Helix theme mappings" run_script helix-theme-mapping/install-omarchy-helix-theme-mapping.sh
     else
         echo
         echo "[skip] Omarchy config not present; skipping Helix theme mappings"

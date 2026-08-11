@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Install and refresh the repository's Omarchy-to-Helix theme overlays.
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

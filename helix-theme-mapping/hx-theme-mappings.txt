@@ -7,8 +7,11 @@ everforest=everforest_dark
 flexoki-light=flexoki_light
 gruvbox=gruvbox
 kanagawa=kanagawa
+last-horizon=horizon-dark
+lupine=term16_light
 nord=nord
 rose-pine=rose_pine_dawn
+solitude=base16_transparent
 tokyo-night=tokyonight
 
 # Omarchy themes without a close built-in Helix equivalent.
@@ -21,4 +24,4 @@ osaka-jade=term16_dark
 retro-82=term16_dark
 ristretto=term16_dark
 vantablack=base16_transparent
-white=term16_dark
+white=term16_light

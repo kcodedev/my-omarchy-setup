@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Rebuild Omarchy theme overlays and Helix's link to the active theme.
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
