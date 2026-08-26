@@ -219,6 +219,34 @@ report_helix_theme_mapping_status() {
     fi
 }
 
+report_urchin_plugin_status() {
+    local plugin_id="kcodedev.urchin"
+    local plugin_manifest="$HOME/.config/omarchy/plugins/$plugin_id/manifest.json"
+    local shell_config="$HOME/.config/omarchy/shell.json"
+
+    if [ ! -f "$plugin_manifest" ]; then
+        print_status "urchin plugin" "missing" "$plugin_manifest"
+    elif ! command -v jq >/dev/null 2>&1; then
+        print_status "urchin plugin" "unknown" "jq not installed"
+    elif [ "$(jq -r '.id // empty' "$plugin_manifest" 2>/dev/null)" = "$plugin_id" ]; then
+        print_status "urchin plugin" "installed" "$plugin_manifest"
+    else
+        print_status "urchin plugin" "invalid" "$plugin_manifest"
+    fi
+
+    if [ ! -f "$shell_config" ]; then
+        print_status "urchin bar widget" "missing" "$shell_config"
+    elif ! command -v jq >/dev/null 2>&1; then
+        print_status "urchin bar widget" "unknown" "jq not installed"
+    elif jq -e --arg plugin_id "$plugin_id" \
+        '.bar.layout | [.left[], .center[], .right[]] | any(.id == $plugin_id)' \
+        "$shell_config" >/dev/null 2>&1; then
+        print_status "urchin bar widget" "installed" "declared in shell.json"
+    else
+        print_status "urchin bar widget" "missing" "not declared in shell.json"
+    fi
+}
+
 report_repo_status() {
     local label="$1"
     local repo_dir="$2"
@@ -298,6 +326,8 @@ doctor() {
     report_command_status npm
     report_command_status pipx
     report_command_status jq
+    report_command_status omarchy
+    report_command_status docker
 
     if has_local_bin_on_path; then
         print_status "PATH ~/.local/bin" "ok"
@@ -307,6 +337,8 @@ doctor() {
 
     report_repo_status "chezmoi source" "$HOME/.local/share/chezmoi"
     report_repo_status "shell-scripts repo" "$HOME/Repos/shell-scripts"
+    report_repo_status "urchin zmk repo" "$HOME/Repos/zmk-urchin-kcodedev"
+    report_urchin_plugin_status
 
     report_source_line_status \
         "hypr lua bootstrap" \
@@ -360,7 +392,7 @@ perform_install() {
     fi
 
     if [ "$include_omarchy_steps" -eq 1 ]; then
-        step_total=$((step_total + 2))
+        step_total=$((step_total + 3))
     fi
 
     echo "Setup mode: $MODE"
@@ -376,10 +408,11 @@ perform_install() {
     run_step "Syncing dotfiles" run_script repos/install-dotfiles.sh
     if [ "$include_omarchy_steps" -eq 1 ]; then
         run_step "Installing and updating Omarchy plugins" run_script plugins/install-omarchy-plugins.sh
+        run_step "Syncing Urchin keyboard setup" run_script repos/install-urchin.sh
         run_step "Installing Omarchy Helix theme mappings" run_script helix-theme-mapping/install-omarchy-helix-theme-mapping.sh
     else
         echo
-        echo "[skip] Omarchy config not present; skipping Helix theme mappings"
+        echo "[skip] Omarchy config not present; skipping plugins and Helix theme mappings"
     fi
     run_step "Applying Brave preferences" run_script browsers/apply-brave-preferences.sh
     run_step "Applying Brave managed policies" run_script browsers/apply-brave-policies.sh

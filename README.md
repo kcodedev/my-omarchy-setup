@@ -7,7 +7,7 @@ This repository contains installation scripts for setting up an Arch Linux envir
 - `packages/` - Special-case package installers; plain `yay` packages are declared in `master-installation.sh`
 - `browsers/` - Browser-specific preference bootstrap scripts
 - `cleanup/` - Explicit cleanup and removal scripts for one-off maintenance tasks
-- `repos/` - Scripts for cloning and setting up personal repositories
+- `repos/` - Scripts for cloning personal repositories and setting up the Urchin keyboard
 - `plugins/` - Idempotent installers for preferred Omarchy shell plugins
 - `hardware/` - Hardware-specific installation scripts (e.g., for MacBook Air)
 - `helix-theme-mapping/` - Maps each Omarchy theme to a matching built-in Helix theme
@@ -74,6 +74,29 @@ and add its desired layout entry to the chezmoi-managed `shell.json`.
 - [Radio Atlas](https://github.com/AksharP5/omarchy-radio-atlas) - provides the Radio Atlas bar widget
 - [NightsWatch](https://github.com/yenst/NightsWatch) - inspects listening ports and stops your own processes
 
+## Urchin Keyboard
+
+The setup keeps the Urchin firmware repository at
+`~/Repos/zmk-urchin-kcodedev` and installs the `kcodedev.urchin` Omarchy plugin
+from its dedicated GitHub repository. The plugin is enabled after chezmoi
+applies `shell.json`, while chezmoi remains responsible for its exact bar
+placement and settings.
+
+On `sync`, clean firmware and plugin checkouts are updated with fast-forward-only
+pulls. A checkout with local changes is left untouched. Docker is reported by
+`doctor` because local ZMK builds require it, but this repository does not
+install or configure Docker automatically.
+
+The repository sources and firmware destination can be overridden for a
+one-off run:
+
+```bash
+URCHIN_ZMK_REPO_URL=git@github.com:example/zmk-urchin.git \
+URCHIN_ZMK_REPO_DIR="$HOME/Repos/zmk-urchin" \
+URCHIN_OMARCHY_PLUGIN_URL=https://github.com/example/urchin-plugin.git \
+./master-installation.sh sync
+```
+
 ## Usage
 
 1. Clone this repository
@@ -112,10 +135,10 @@ than host-specific templates.
 
 - `install` auto-detects MacBook hardware and runs the hardware extras for that host
 - `sync` updates existing repos with `git pull --ff-only` when they are clean, and skips pulling if you have local changes
+- `sync` installs or updates the Urchin Omarchy plugin after applying dotfiles, preserving the chezmoi-owned bar layout
 - `sync` applies dotfiles with chezmoi from `~/.local/share/chezmoi`
 - Brave preferences and managed policies are re-applied during install/sync for repo-managed defaults such as vertical tabs and force-installed extensions
-- `doctor` reports command availability, repo state, Hyprland Lua module status, and Omarchy hook status
-- `doctor` reports whether preferred Omarchy shell plugins are installed
+- `doctor` reports command availability, repo state, Hyprland Lua module status, preferred Omarchy plugin status, and Urchin readiness
 - `master-cleanup.sh` runs the repo cleanup scripts without mixing removals into install/sync
 - Hyprland-specific steps skip cleanly when `~/.config/hypr/hyprland.lua` is not present
 - npm and pipx tools are only upgraded when `BOOTSTRAP_UPGRADE=1` is set
