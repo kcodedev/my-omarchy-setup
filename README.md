@@ -8,6 +8,7 @@ This repository contains installation scripts for setting up an Arch Linux envir
 - `browsers/` - Browser-specific preference bootstrap scripts
 - `cleanup/` - Explicit cleanup and removal scripts for one-off maintenance tasks
 - `repos/` - Scripts for cloning and setting up personal repositories
+- `plugins/` - Idempotent installers for preferred Omarchy shell plugins
 - `hardware/` - Hardware-specific installation scripts (e.g., for MacBook Air)
 - `helix-theme-mapping/` - Maps each Omarchy theme to a matching built-in Helix theme
 - `master-installation.sh` - Main script that runs all installations in order
@@ -58,6 +59,20 @@ Common Waybar migrations are:
 - battery percentage -> use the `omarchy.power` widget (right-click toggles percentage)
 - launcher refresh -> no Walker restart; Quickshell watches desktop entries
 
+### Preferred Omarchy Plugins
+
+[`plugins/install-omarchy-plugins.sh`](plugins/install-omarchy-plugins.sh) installs
+missing plugins and updates existing plugins to their latest upstream version on
+every `install` or `sync` run. Plugin placement and settings remain managed by
+chezmoi through `~/.config/omarchy/shell.json`.
+
+The preferred plugin sources are declared in
+[`plugins/omarchy-plugins.txt`](plugins/omarchy-plugins.txt). Add a plugin there
+and add its desired layout entry to the chezmoi-managed `shell.json`.
+
+- [GitHub Build Monitor](https://github.com/jankeesvw/omarchy-github-build-monitor) - shows GitHub Actions build status in the bar
+- [Radio Atlas](https://github.com/AksharP5/omarchy-radio-atlas) - provides the Radio Atlas bar widget
+
 ## Usage
 
 1. Clone this repository
@@ -99,6 +114,7 @@ than host-specific templates.
 - `sync` applies dotfiles with chezmoi from `~/.local/share/chezmoi`
 - Brave preferences and managed policies are re-applied during install/sync for repo-managed defaults such as vertical tabs and force-installed extensions
 - `doctor` reports command availability, repo state, Hyprland Lua module status, and Omarchy hook status
+- `doctor` reports whether preferred Omarchy shell plugins are installed
 - `master-cleanup.sh` runs the repo cleanup scripts without mixing removals into install/sync
 - Hyprland-specific steps skip cleanly when `~/.config/hypr/hyprland.lua` is not present
 - npm and pipx tools are only upgraded when `BOOTSTRAP_UPGRADE=1` is set

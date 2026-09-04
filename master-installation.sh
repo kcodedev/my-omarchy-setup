@@ -257,6 +257,35 @@ report_source_line_status() {
     fi
 }
 
+report_omarchy_plugin_status() {
+    local plugin_id="$1"
+    local plugin_dir="$HOME/.config/omarchy/plugins/$plugin_id"
+
+    if ! has_omarchy_install; then
+        print_status "$plugin_id" "skipped" "~/.config/omarchy not present"
+    elif [ ! -d "$plugin_dir" ]; then
+        print_status "$plugin_id" "missing"
+    elif [ ! -d "$plugin_dir/.git" ]; then
+        print_status "$plugin_id" "drifted" "$plugin_dir is not a git checkout"
+    else
+        print_status "$plugin_id" "installed" "$(git -C "$plugin_dir" rev-parse --short HEAD 2>/dev/null || echo unknown)"
+    fi
+}
+
+report_omarchy_plugins_status() {
+    local plugins_file="$SCRIPT_DIR/plugins/omarchy-plugins.txt"
+    local plugin_id
+    local plugin_url
+
+    while read -r plugin_id plugin_url; do
+        if [ -z "$plugin_id" ] || [[ "$plugin_id" == \#* ]]; then
+            continue
+        fi
+
+        report_omarchy_plugin_status "$plugin_id"
+    done <"$plugins_file"
+}
+
 doctor() {
     echo "Setup doctor"
     echo "Mode: inspect-only"
@@ -302,11 +331,12 @@ doctor() {
     report_brave_vertical_tabs_status
     report_brave_extension_policy_status
     report_helix_theme_mapping_status
+    report_omarchy_plugins_status
 }
 
 perform_install() {
     local include_hyprland_steps=0
-    local include_helix_theme_mapping=0
+    local include_omarchy_steps=0
 
     require_command yay
     require_command git
@@ -316,7 +346,7 @@ perform_install() {
     fi
 
     if has_omarchy_install; then
-        include_helix_theme_mapping=1
+        include_omarchy_steps=1
     fi
 
     step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 4))
@@ -329,8 +359,8 @@ perform_install() {
         step_total=$((step_total + 1))
     fi
 
-    if [ "$include_helix_theme_mapping" -eq 1 ]; then
-        step_total=$((step_total + 1))
+    if [ "$include_omarchy_steps" -eq 1 ]; then
+        step_total=$((step_total + 2))
     fi
 
     echo "Setup mode: $MODE"
@@ -344,7 +374,8 @@ perform_install() {
     done
     run_step "Syncing shell-scripts repo and wrappers" run_script repos/install-repo-shell-scripts.sh
     run_step "Syncing dotfiles" run_script repos/install-dotfiles.sh
-    if [ "$include_helix_theme_mapping" -eq 1 ]; then
+    if [ "$include_omarchy_steps" -eq 1 ]; then
+        run_step "Installing and updating Omarchy plugins" run_script plugins/install-omarchy-plugins.sh
         run_step "Installing Omarchy Helix theme mappings" run_script helix-theme-mapping/install-omarchy-helix-theme-mapping.sh
     else
         echo
