@@ -1,4 +1,3 @@
 # Plugin ID                              Git repository
 jankeesvw.github-build-monitor           https://github.com/jankeesvw/omarchy-github-build-monitor.git
 akshar.radio-atlas                       https://github.com/AksharP5/omarchy-radio-atlas.git
-yenst.nightswatch                        https://github.com/yenst/NightsWatch.git
