@@ -151,6 +151,8 @@ report_brave_vertical_tabs_status() {
 report_brave_extension_policy_status() {
     local policy_file="/etc/brave/policies/managed/extensions.json"
     local vimium_policy="dbepggeogbaibhgnhhndojpepiihcmeb;https://clients2.google.com/service/update2/crx"
+    local socialfocus_policy="abocjojdmemdpiffeadpdnicnlhcndcg;https://clients2.google.com/service/update2/crx"
+    local dark_reader_policy="eimadpbcbfnmbkopoojfekhnkhdbieeh;https://clients2.google.com/service/update2/crx"
 
     if [ ! -f "$policy_file" ]; then
         print_status "brave extensions" "missing" "$policy_file not present"
@@ -162,10 +164,16 @@ report_brave_extension_policy_status() {
         return
     fi
 
-    if jq -e --arg vimium_policy "$vimium_policy" \
-        '.ExtensionInstallForcelist // [] | index($vimium_policy)' \
+    if jq -e \
+        --arg vimium_policy "$vimium_policy" \
+        --arg socialfocus_policy "$socialfocus_policy" \
+        --arg dark_reader_policy "$dark_reader_policy" \
+        '.ExtensionInstallForcelist // [] |
+         index($vimium_policy) != null and
+         index($socialfocus_policy) != null and
+         index($dark_reader_policy) != null' \
         "$policy_file" >/dev/null 2>&1; then
-        print_status "brave extensions" "installed" "Vimium"
+        print_status "brave extensions" "installed" "Vimium, SocialFocus, Dark Reader"
     else
         print_status "brave extensions" "drifted" "$policy_file"
     fi
