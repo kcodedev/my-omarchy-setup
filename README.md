@@ -70,7 +70,6 @@ The preferred plugin sources are declared in
 [`plugins/omarchy-plugins.txt`](plugins/omarchy-plugins.txt). Add a plugin there
 and add its desired layout entry to the chezmoi-managed `shell.json`.
 
-- [GitHub Build Monitor](https://github.com/jankeesvw/omarchy-github-build-monitor) - shows GitHub Actions build status in the bar
 - [Radio Atlas](https://github.com/AksharP5/omarchy-radio-atlas) - provides the Radio Atlas bar widget
 
 ## Urchin Keyboard
