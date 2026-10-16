@@ -10,7 +10,6 @@ This repository contains installation scripts for setting up an Arch Linux envir
 - `repos/` - Scripts for cloning personal repositories and setting up the Urchin keyboard
 - `plugins/` - Idempotent installers for preferred Omarchy shell plugins
 - `hardware/` - Hardware-specific installation scripts (e.g., for MacBook Air)
-- `helix-theme-mapping/` - Maps each Omarchy theme to a matching built-in Helix theme
 - `master-installation.sh` - Main script that runs all installations in order
 - `master-cleanup.sh` - Main script that runs the repo cleanup scripts in one pass
 - `install-hyprland-overrides.sh` - Validates Omarchy 4's Hyprland Lua entrypoint and user-module imports

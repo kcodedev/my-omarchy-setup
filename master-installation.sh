@@ -11,7 +11,6 @@ PRODUCT_NAME="$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "Unknown"
 YAY_PACKAGES=(
     jq
     chezmoi
-    helix
     keepassxc
     brave-bin
     tmux
@@ -179,54 +178,6 @@ report_brave_extension_policy_status() {
     fi
 }
 
-report_helix_theme_mapping_status() {
-    local config_file="$HOME/.config/helix/config.toml"
-    local omarchy_theme_file="$HOME/.config/helix/themes/omarchy.toml"
-    local mappings_file="$SCRIPT_DIR/helix-theme-mapping/hx-theme-mappings.txt"
-    local mapped_total=0
-    local mapped_installed=0
-    local theme_name
-
-    if ! has_omarchy_install; then
-        print_status "helix theme map" "skipped" "~/.config/omarchy not present"
-        return
-    fi
-
-    if [ -f "$config_file" ] && grep -Eq '^[[:space:]]*theme[[:space:]]*=[[:space:]]*"omarchy"' "$config_file"; then
-        print_status "helix theme" "installed" "theme = omarchy"
-    else
-        print_status "helix theme" "drifted" "$config_file"
-    fi
-
-    if [ -L "$omarchy_theme_file" ] &&
-       [ "$(readlink -f "$omarchy_theme_file")" = "$HOME/.local/state/omarchy/current/theme/helix.toml" ]; then
-        print_status "helix omarchy link" "installed"
-    else
-        print_status "helix omarchy link" "drifted" "$omarchy_theme_file"
-    fi
-
-    if [ ! -f "$mappings_file" ]; then
-        print_status "helix theme map" "missing" "$mappings_file"
-        return
-    fi
-
-    while IFS='=' read -r theme_name _; do
-        [[ $theme_name =~ ^[[:space:]]*# ]] && continue
-        [[ -z $theme_name ]] && continue
-
-        mapped_total=$((mapped_total + 1))
-        if [ -f "$HOME/.config/omarchy/themes/$theme_name/helix.toml" ]; then
-            mapped_installed=$((mapped_installed + 1))
-        fi
-    done <"$mappings_file"
-
-    if [ "$mapped_total" -gt 0 ] && [ "$mapped_installed" -eq "$mapped_total" ]; then
-        print_status "helix theme map" "installed" "$mapped_installed/$mapped_total overlays"
-    else
-        print_status "helix theme map" "drifted" "$mapped_installed/$mapped_total overlays"
-    fi
-}
-
 report_urchin_plugin_status() {
     local plugin_id="kcodedev.urchin"
     local plugin_manifest="$HOME/.config/omarchy/plugins/$plugin_id/manifest.json"
@@ -370,7 +321,6 @@ doctor() {
         'require("hypr.looknfeel")'
     report_brave_vertical_tabs_status
     report_brave_extension_policy_status
-    report_helix_theme_mapping_status
     report_omarchy_plugins_status
 }
 
@@ -400,7 +350,7 @@ perform_install() {
     fi
 
     if [ "$include_omarchy_steps" -eq 1 ]; then
-        step_total=$((step_total + 3))
+        step_total=$((step_total + 2))
     fi
 
     echo "Setup mode: $MODE"
@@ -417,10 +367,9 @@ perform_install() {
     if [ "$include_omarchy_steps" -eq 1 ]; then
         run_step "Installing and updating Omarchy plugins" run_script plugins/install-omarchy-plugins.sh
         run_step "Syncing Urchin keyboard setup" run_script repos/install-urchin.sh
-        run_step "Installing Omarchy Helix theme mappings" run_script helix-theme-mapping/install-omarchy-helix-theme-mapping.sh
     else
         echo
-        echo "[skip] Omarchy config not present; skipping plugins and Helix theme mappings"
+        echo "[skip] Omarchy config not present; skipping plugins and Urchin setup"
     fi
     run_step "Applying Brave preferences" run_script browsers/apply-brave-preferences.sh
     run_step "Applying Brave managed policies" run_script browsers/apply-brave-policies.sh
