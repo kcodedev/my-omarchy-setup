@@ -137,6 +137,7 @@ than host-specific templates.
 - Brave preferences and managed policies are re-applied during install/sync for repo-managed defaults such as vertical tabs and force-installed extensions
 - `doctor` reports command availability, repo state, Hyprland Lua module status, preferred Omarchy plugin status, and Urchin readiness
 - `master-cleanup.sh` runs the repo cleanup scripts without mixing removals into install/sync
+- `cleanup/remove-helix.sh` removes Helix, its theme overlays, and the old `hx` alias; editor config is preserved unless `--purge-data` is passed
 - Hyprland-specific steps skip cleanly when `~/.config/hypr/hyprland.lua` is not present
 - npm and pipx tools are only upgraded when `BOOTSTRAP_UPGRADE=1` is set
 - Hardware-specific scripts include detection to prevent running on incompatible systems

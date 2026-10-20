@@ -15,6 +15,7 @@ CLEANUP_SCRIPTS=(
     "cleanup/remove-1password.sh"
     "cleanup/remove-signal-desktop.sh"
     "cleanup/remove-typora.sh"
+    "cleanup/remove-helix.sh"
 )
 
 step_index=0
@@ -49,7 +50,7 @@ script_args() {
     fi
 
     case "$script_name" in
-        cleanup/remove-1password.sh|cleanup/remove-signal-desktop.sh|cleanup/remove-typora.sh)
+        cleanup/remove-1password.sh|cleanup/remove-signal-desktop.sh|cleanup/remove-typora.sh|cleanup/remove-helix.sh)
             printf '%s\n' "--purge-data"
             ;;
     esac
