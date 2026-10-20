@@ -23,6 +23,20 @@ else
     echo "Helix package is not installed"
 fi
 
+for launcher in \
+    "$HOME/.local/share/applications/helix.desktop" \
+    "$HOME/.local/share/omarchy/applications/helix.desktop"; do
+    if [ -e "$launcher" ] || [ -L "$launcher" ]; then
+        echo "Removing $launcher"
+        rm -f "$launcher"
+    fi
+done
+
+if command -v update-desktop-database >/dev/null 2>&1 &&
+   [ -d "$HOME/.local/share/applications" ]; then
+    update-desktop-database "$HOME/.local/share/applications"
+fi
+
 # Older versions installed a theme-set wrapper or appended an updater call.
 hook="$HOME/.config/omarchy/hooks/theme-set"
 updater="helix-theme-mapping/update-helix-theme.sh"
