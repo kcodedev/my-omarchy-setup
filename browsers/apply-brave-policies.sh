@@ -10,6 +10,7 @@ CHROME_WEBSTORE_UPDATE_URL="https://clients2.google.com/service/update2/crx"
 VIMIUM_EXTENSION_ID="dbepggeogbaibhgnhhndojpepiihcmeb"
 SOCIALFOCUS_EXTENSION_ID="abocjojdmemdpiffeadpdnicnlhcndcg"
 DARK_READER_EXTENSION_ID="eimadpbcbfnmbkopoojfekhnkhdbieeh"
+CHATGPT_EXTENSION_ID="hehggadaopoacecdllhhajmbjkdcmajg"
 
 require_command() {
     local command_name="$1"
@@ -24,6 +25,7 @@ main() {
     local policy_entry="$VIMIUM_EXTENSION_ID;$CHROME_WEBSTORE_UPDATE_URL"
     local socialfocus_policy_entry="$SOCIALFOCUS_EXTENSION_ID;$CHROME_WEBSTORE_UPDATE_URL"
     local dark_reader_policy_entry="$DARK_READER_EXTENSION_ID;$CHROME_WEBSTORE_UPDATE_URL"
+    local chatgpt_policy_entry="$CHATGPT_EXTENSION_ID;$CHROME_WEBSTORE_UPDATE_URL"
     local temp_file
 
     require_command jq
@@ -32,7 +34,8 @@ main() {
     jq -n --arg policy_entry "$policy_entry" \
         --arg socialfocus_policy_entry "$socialfocus_policy_entry" \
         --arg dark_reader_policy_entry "$dark_reader_policy_entry" \
-        '{ExtensionInstallForcelist: [$policy_entry, $socialfocus_policy_entry, $dark_reader_policy_entry]}' >"$temp_file"
+        --arg chatgpt_policy_entry "$chatgpt_policy_entry" \
+        '{ExtensionInstallForcelist: [$policy_entry, $socialfocus_policy_entry, $dark_reader_policy_entry, $chatgpt_policy_entry]}' >"$temp_file"
 
     if [ -d "$BRAVE_POLICY_DIR" ] && [ -w "$BRAVE_POLICY_DIR" ]; then
         install -m 644 "$temp_file" "$BRAVE_EXTENSION_POLICY_FILE"
@@ -47,7 +50,7 @@ main() {
     rm -f "$temp_file"
 
     echo "Applied Brave extension policy to $BRAVE_EXTENSION_POLICY_FILE"
-    echo "Force-installed extensions: Vimium, SocialFocus, Dark Reader"
+    echo "Force-installed extensions: Vimium, SocialFocus, Dark Reader, ChatGPT"
 }
 
 main "$@"

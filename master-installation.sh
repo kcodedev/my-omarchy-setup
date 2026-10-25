@@ -152,6 +152,7 @@ report_brave_extension_policy_status() {
     local vimium_policy="dbepggeogbaibhgnhhndojpepiihcmeb;https://clients2.google.com/service/update2/crx"
     local socialfocus_policy="abocjojdmemdpiffeadpdnicnlhcndcg;https://clients2.google.com/service/update2/crx"
     local dark_reader_policy="eimadpbcbfnmbkopoojfekhnkhdbieeh;https://clients2.google.com/service/update2/crx"
+    local chatgpt_policy="hehggadaopoacecdllhhajmbjkdcmajg;https://clients2.google.com/service/update2/crx"
 
     if [ ! -f "$policy_file" ]; then
         print_status "brave extensions" "missing" "$policy_file not present"
@@ -167,12 +168,14 @@ report_brave_extension_policy_status() {
         --arg vimium_policy "$vimium_policy" \
         --arg socialfocus_policy "$socialfocus_policy" \
         --arg dark_reader_policy "$dark_reader_policy" \
+        --arg chatgpt_policy "$chatgpt_policy" \
         '.ExtensionInstallForcelist // [] |
          index($vimium_policy) != null and
          index($socialfocus_policy) != null and
-         index($dark_reader_policy) != null' \
+         index($dark_reader_policy) != null and
+         index($chatgpt_policy) != null' \
         "$policy_file" >/dev/null 2>&1; then
-        print_status "brave extensions" "installed" "Vimium, SocialFocus, Dark Reader"
+        print_status "brave extensions" "installed" "Vimium, SocialFocus, Dark Reader, ChatGPT"
     else
         print_status "brave extensions" "drifted" "$policy_file"
     fi
