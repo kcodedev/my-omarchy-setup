@@ -1,7 +1,5 @@
 # Omarchy Setup
 
-This repository contains installation scripts for setting up an Arch Linux environment with various tools and configurations.
-
 ## Structure
 
 - `browsers/` - Browser-specific preference bootstrap scripts
