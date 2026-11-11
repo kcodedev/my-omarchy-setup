@@ -1,50 +1,56 @@
 # Omarchy Setup
 
+Personal Omarchy bootstrap, dotfiles, plugins, and cleanup scripts.
+
+## Usage
+
+Requires Arch Linux with `yay` and Git SSH access to private repositories.
+Clone this repository, then run:
+
+```bash
+./master-installation.sh install  # Bootstrap a machine
+./master-installation.sh sync     # Update repos, plugins, and dotfiles
+./master-installation.sh doctor   # Check machine state without changes
+./master-cleanup.sh               # Remove unwanted apps, keeping user data
+./master-cleanup.sh --purge-data  # Also remove data where supported
+```
+
+`sync` uses fast-forward-only pulls and skips checkouts with local changes.
+Install and sync also reapply Brave preferences and managed policies.
+Keep `~/.local/bin` on `PATH` for npm's user-local install fallback.
+
 ## Structure
 
 - `browsers/` - Browser-specific preference bootstrap scripts
 - `cleanup/` - Explicit cleanup and removal scripts for one-off maintenance tasks
 - `repos/` - Scripts for cloning personal repositories and setting up the Urchin keyboard
 - `plugins/` - Idempotent installers for preferred Omarchy shell plugins
-- `master-installation.sh` - Main script that runs all installations in order
-- `master-cleanup.sh` - Main script that runs the repo cleanup scripts in one pass
+- `master-installation.sh` - Install, sync, and machine checks
+- `master-cleanup.sh` - Run all cleanup scripts
 - `install-hyprland-overrides.sh` - Validates Omarchy 4's Hyprland Lua entrypoint and user-module imports
 
 ## Hyprland Personal Config
 
-Omarchy 4 configures Hyprland in Lua. The active entrypoint is
-`~/.config/hypr/hyprland.lua`, which loads Omarchy's defaults followed by these
-user-owned modules:
-
-```lua
-require("hypr.monitors")
-require("hypr.input")
-require("hypr.bindings")
-require("hypr.looknfeel")
-require("hypr.autostart")
-```
-
-Personal Hyprland settings belong in the corresponding `.lua` files under
-`~/.config/hypr/`. The chezmoi source repository must therefore manage:
+Omarchy 4 loads defaults and personal Lua modules through
+`~/.config/hypr/hyprland.lua`. Manage personal settings with chezmoi:
 
 - `dot_config/hypr/bindings.lua` for `hl.unbind(...)` and `o.bind(...)` calls
 - `dot_config/hypr/monitors.lua` for `hl.env(...)` and `hl.monitor(...)` calls
 - `dot_config/hypr/input.lua` for `hl.config({ input = ... })`
 - `dot_config/hypr/looknfeel.lua` for gaps, borders, and animation settings
+- `dot_config/hypr/autostart.lua` for startup commands
 - `dot_config/hypr/hyprland.lua` only when the stock Omarchy entrypoint itself needs changing
 
-Legacy `personal.conf`, `common.conf`, and host `.conf` fragments are not loaded
-by the Lua entrypoint. The [`install-hyprland-overrides.sh`](install-hyprland-overrides.sh)
-script verifies the Lua bootstrap/imports and checks a live Hyprland session for
-configuration errors; it no longer edits the inactive `.conf` stub.
+Legacy `.conf` fragments are not loaded. The
+[`install-hyprland-overrides.sh`](install-hyprland-overrides.sh) script checks
+Lua imports and live session errors. Hyprland steps skip when the Lua entrypoint
+is absent.
 
 ## Quickshell
 
-Omarchy 4 replaced Waybar and Walker with the Omarchy shell built on Quickshell.
-Bar layout and built-in widgets are configured by
-`~/.config/omarchy/shell.json`; personal plugin code belongs under
-`~/.config/omarchy/plugins/`. A chezmoi-managed `dot_config/waybar/` directory
-has no effect on the Omarchy 4 bar.
+Omarchy 4 uses Quickshell instead of Waybar and Walker. Manage bar layout and
+widget settings in `~/.config/omarchy/shell.json` through chezmoi; personal
+plugins live in `~/.config/omarchy/plugins/`. Waybar config has no effect.
 
 Common Waybar migrations are:
 
@@ -57,28 +63,19 @@ Common Waybar migrations are:
 ### Preferred Omarchy Plugins
 
 [`plugins/install-omarchy-plugins.sh`](plugins/install-omarchy-plugins.sh) installs
-missing plugins and updates existing plugins to their latest upstream version on
-every `install` or `sync` run. Plugin placement and settings remain managed by
-chezmoi through `~/.config/omarchy/shell.json`.
-
-The preferred plugin sources are declared in
-[`plugins/omarchy-plugins.txt`](plugins/omarchy-plugins.txt). Add a plugin there
-and add its desired layout entry to the chezmoi-managed `shell.json`.
+or updates plugins on each `install` and `sync`. Add sources to
+[`plugins/omarchy-plugins.txt`](plugins/omarchy-plugins.txt) and layout entries
+to the chezmoi-managed `shell.json`.
 
 - [Radio Atlas](https://github.com/AksharP5/omarchy-radio-atlas) - provides the Radio Atlas bar widget
 
 ## Urchin Keyboard
 
-The setup keeps the Urchin firmware repository at
-`~/Repos/zmk-urchin-kcodedev` and installs the `kcodedev.urchin` Omarchy plugin
-from its dedicated GitHub repository. The plugin is enabled after chezmoi
-applies `shell.json`, while chezmoi remains responsible for its exact bar
-placement and settings.
+Urchin firmware lives at `~/Repos/zmk-urchin-kcodedev`. The `kcodedev.urchin`
+plugin is installed and enabled after chezmoi applies `shell.json`, which owns
+its placement and settings.
 
-On `sync`, clean firmware and plugin checkouts are updated with fast-forward-only
-pulls. A checkout with local changes is left untouched. Docker is reported by
-`doctor` because local ZMK builds require it, but this repository does not
-install or configure Docker automatically.
+Local ZMK builds require Docker. `doctor` checks for it; setup does not install it.
 
 The repository sources and firmware destination can be overridden for a
 one-off run:
@@ -90,18 +87,9 @@ URCHIN_OMARCHY_PLUGIN_URL=https://github.com/example/urchin-plugin.git \
 ./master-installation.sh sync
 ```
 
-## Usage
-
-1. Clone this repository
-2. Run a full machine bootstrap: `./master-installation.sh install`
-3. Re-sync an existing machine after repo changes: `./master-installation.sh sync`
-4. Inspect the current machine state without changing anything: `./master-installation.sh doctor`
-5. Remove unwanted Omarchy apps in one pass: `./master-cleanup.sh`
-6. Also purge app data for supported cleanup scripts: `./master-cleanup.sh --purge-data`
-
 ## Dotfiles
 
-Dotfiles are managed with chezmoi. The default source repository is:
+Chezmoi applies dotfiles from `~/.local/share/chezmoi`, using this repository:
 
 ```bash
 git@github.com:kcodedev/dotfiles-chezmoi.git
@@ -113,25 +101,13 @@ Override it for a one-off run with:
 CHEZMOI_DOTFILES_REPO_URL=git@github.com:kcodedev/other-dotfiles.git ./master-installation.sh sync
 ```
 
-The intended setup is identical config across `dell-7430`, `acer-revo-mini-pc`, and
-`macbook-air-2015`, so the first chezmoi repo should stay mostly plain files rather
-than host-specific templates.
+Keep config shared across `dell-7430`, `acer-revo-mini-pc`, and `macbook-air-2015`;
+prefer plain files over host-specific templates. Omarchy handles hardware drivers
+and MacBook support.
 
-## Prerequisites
+## Cleanup
 
-- Arch Linux with yay installed
-- Git configured for SSH access to private repos
-- `~/.local/bin` on your `PATH` if you want npm global installs to fall back to a user-local prefix
-
-## Notes
-
-- Hardware drivers and MacBook support are handled by Omarchy
-- `sync` updates existing repos with `git pull --ff-only` when they are clean, and skips pulling if you have local changes
-- `sync` installs or updates the Urchin Omarchy plugin after applying dotfiles, preserving the chezmoi-owned bar layout
-- `sync` applies dotfiles with chezmoi from `~/.local/share/chezmoi`
-- Brave preferences and managed policies are re-applied during install/sync for repo-managed defaults such as vertical tabs and force-installed extensions
-- `doctor` reports command availability, repo state, Hyprland Lua module status, preferred Omarchy plugin status, and Urchin readiness
-- `master-cleanup.sh` runs the repo cleanup scripts without mixing removals into install/sync
-- Cleanup also removes LibreOffice, Spotify, Zed, Cursor, and DBeaver while preserving their settings and user data; these apps are not installed by this repo
-- `cleanup/remove-helix.sh` removes Helix, its theme overlays, and the old `hx` alias; editor config is preserved unless `--purge-data` is passed
-- Hyprland-specific steps skip cleanly when `~/.config/hypr/hyprland.lua` is not present
+Cleanup runs separately from install/sync. It removes apps including LibreOffice,
+Spotify, Zed, Cursor, and DBeaver while preserving settings and user data by default.
+[`cleanup/remove-helix.sh`](cleanup/remove-helix.sh) also removes Helix theme
+overlays and the old `hx` alias; `--purge-data` removes its editor config too.
