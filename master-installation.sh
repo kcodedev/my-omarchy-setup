@@ -15,11 +15,9 @@ YAY_PACKAGES=(
     tmux
     kitty
     visual-studio-code-bin
-    cursor-bin
     yazi
     localsend
     obsidian
-    dbeaver
     dropbox-cli
     cava
     lazygit

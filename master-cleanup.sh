@@ -16,6 +16,11 @@ CLEANUP_SCRIPTS=(
     "cleanup/remove-signal-desktop.sh"
     "cleanup/remove-typora.sh"
     "cleanup/remove-helix.sh"
+    "cleanup/remove-libreoffice.sh"
+    "cleanup/remove-spotify.sh"
+    "cleanup/remove-zed.sh"
+    "cleanup/remove-cursor.sh"
+    "cleanup/remove-dbeaver.sh"
 )
 
 step_index=0
