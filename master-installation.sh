@@ -29,10 +29,6 @@ YAY_PACKAGES=(
     railwayapp-cli
 )
 
-SPECIAL_INSTALL_SCRIPTS=(
-    "packages/install-pipx.sh"
-)
-
 step_index=0
 step_total=0
 
@@ -278,7 +274,6 @@ doctor() {
     report_command_status git
     report_command_status chezmoi
     report_command_status npm
-    report_command_status pipx
     report_command_status jq
     report_command_status omarchy
     report_command_status docker
@@ -334,7 +329,7 @@ perform_install() {
         include_omarchy_steps=1
     fi
 
-    step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 4))
+    step_total=5
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
         step_total=$((step_total + 1))
@@ -349,9 +344,6 @@ perform_install() {
 
     run_step "Installing base yay packages" install_yay_packages "${YAY_PACKAGES[@]}"
 
-    for package_script in "${SPECIAL_INSTALL_SCRIPTS[@]}"; do
-        run_step "Running $package_script" run_script "$package_script"
-    done
     run_step "Syncing shell-scripts repo and wrappers" run_script repos/install-repo-shell-scripts.sh
     run_step "Syncing dotfiles" run_script repos/install-dotfiles.sh
     if [ "$include_omarchy_steps" -eq 1 ]; then
@@ -386,8 +378,6 @@ Usage: ./master-installation.sh [install|sync|doctor]
 install  Full setup run.
 sync     Re-run the reusable setup steps and update existing repos.
 doctor   Inspect local setup state without changing anything.
-
-Set BOOTSTRAP_UPGRADE=1 to upgrade already-installed npm and pipx tools.
 EOF
         ;;
     *)

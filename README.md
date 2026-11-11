@@ -4,7 +4,6 @@ This repository contains installation scripts for setting up an Arch Linux envir
 
 ## Structure
 
-- `packages/` - Special-case package installers; plain `yay` packages are declared in `master-installation.sh`
 - `browsers/` - Browser-specific preference bootstrap scripts
 - `cleanup/` - Explicit cleanup and removal scripts for one-off maintenance tasks
 - `repos/` - Scripts for cloning personal repositories and setting up the Urchin keyboard
@@ -99,9 +98,8 @@ URCHIN_OMARCHY_PLUGIN_URL=https://github.com/example/urchin-plugin.git \
 2. Run a full machine bootstrap: `./master-installation.sh install`
 3. Re-sync an existing machine after repo changes: `./master-installation.sh sync`
 4. Inspect the current machine state without changing anything: `./master-installation.sh doctor`
-5. Upgrade already-installed npm and pipx tools during a sync: `BOOTSTRAP_UPGRADE=1 ./master-installation.sh sync`
-6. Remove unwanted Omarchy apps in one pass: `./master-cleanup.sh`
-7. Also purge app data for supported cleanup scripts: `./master-cleanup.sh --purge-data`
+5. Remove unwanted Omarchy apps in one pass: `./master-cleanup.sh`
+6. Also purge app data for supported cleanup scripts: `./master-cleanup.sh --purge-data`
 
 ## Dotfiles
 
@@ -139,4 +137,3 @@ than host-specific templates.
 - Cleanup also removes LibreOffice, Spotify, Zed, Cursor, and DBeaver while preserving their settings and user data; these apps are not installed by this repo
 - `cleanup/remove-helix.sh` removes Helix, its theme overlays, and the old `hx` alias; editor config is preserved unless `--purge-data` is passed
 - Hyprland-specific steps skip cleanly when `~/.config/hypr/hyprland.lua` is not present
-- npm and pipx tools are only upgraded when `BOOTSTRAP_UPGRADE=1` is set
