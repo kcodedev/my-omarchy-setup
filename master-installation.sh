@@ -6,7 +6,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 MODE="${1:-install}"
-PRODUCT_NAME="$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "Unknown")"
 
 YAY_PACKAGES=(
     jq
@@ -90,10 +89,6 @@ has_local_bin_on_path() {
         *":$HOME/.local/bin:"*) return 0 ;;
         *) return 1 ;;
     esac
-}
-
-is_macbook_host() {
-    [[ "$PRODUCT_NAME" == *"MacBook"* ]]
 }
 
 print_status() {
@@ -281,7 +276,6 @@ doctor() {
     echo "Mode: inspect-only"
     echo
 
-    print_status "host" "$(if is_macbook_host; then echo macbook; else echo generic; fi)" "$PRODUCT_NAME"
     report_command_status yay
     report_command_status git
     report_command_status chezmoi
@@ -344,10 +338,6 @@ perform_install() {
 
     step_total=$((1 + ${#SPECIAL_INSTALL_SCRIPTS[@]} + 4))
 
-    if [ "$MODE" = "install" ] && is_macbook_host; then
-        step_total=$((step_total + 1))
-    fi
-
     if [ "$include_hyprland_steps" -eq 1 ]; then
         step_total=$((step_total + 1))
     fi
@@ -357,7 +347,6 @@ perform_install() {
     fi
 
     echo "Setup mode: $MODE"
-    echo "Detected host: $PRODUCT_NAME"
     echo
 
     run_step "Installing base yay packages" install_yay_packages "${YAY_PACKAGES[@]}"
@@ -376,10 +365,6 @@ perform_install() {
     fi
     run_step "Applying Brave preferences" run_script browsers/apply-brave-preferences.sh
     run_step "Applying Brave managed policies" run_script browsers/apply-brave-policies.sh
-
-    if [ "$MODE" = "install" ] && is_macbook_host; then
-        run_step "Running MacBook hardware extras" run_script hardware/install-macbook-air.sh
-    fi
 
     if [ "$include_hyprland_steps" -eq 1 ]; then
         run_step "Validating Hyprland Lua configuration" run_script install-hyprland-overrides.sh
@@ -400,7 +385,7 @@ case "$MODE" in
         cat <<'EOF'
 Usage: ./master-installation.sh [install|sync|doctor]
 
-install  Full setup run, including host-specific extras.
+install  Full setup run.
 sync     Re-run the reusable setup steps and update existing repos.
 doctor   Inspect local setup state without changing anything.
 

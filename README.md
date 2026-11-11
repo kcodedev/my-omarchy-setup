@@ -9,7 +9,6 @@ This repository contains installation scripts for setting up an Arch Linux envir
 - `cleanup/` - Explicit cleanup and removal scripts for one-off maintenance tasks
 - `repos/` - Scripts for cloning personal repositories and setting up the Urchin keyboard
 - `plugins/` - Idempotent installers for preferred Omarchy shell plugins
-- `hardware/` - Hardware-specific installation scripts (e.g., for MacBook Air)
 - `master-installation.sh` - Main script that runs all installations in order
 - `master-cleanup.sh` - Main script that runs the repo cleanup scripts in one pass
 - `install-hyprland-overrides.sh` - Validates Omarchy 4's Hyprland Lua entrypoint and user-module imports
@@ -130,7 +129,7 @@ than host-specific templates.
 
 ## Notes
 
-- `install` auto-detects MacBook hardware and runs the hardware extras for that host
+- Hardware drivers and MacBook support are handled by Omarchy
 - `sync` updates existing repos with `git pull --ff-only` when they are clean, and skips pulling if you have local changes
 - `sync` installs or updates the Urchin Omarchy plugin after applying dotfiles, preserving the chezmoi-owned bar layout
 - `sync` applies dotfiles with chezmoi from `~/.local/share/chezmoi`
@@ -140,5 +139,3 @@ than host-specific templates.
 - `cleanup/remove-helix.sh` removes Helix, its theme overlays, and the old `hx` alias; editor config is preserved unless `--purge-data` is passed
 - Hyprland-specific steps skip cleanly when `~/.config/hypr/hyprland.lua` is not present
 - npm and pipx tools are only upgraded when `BOOTSTRAP_UPGRADE=1` is set
-- Hardware-specific scripts include detection to prevent running on incompatible systems
-- Reboot recommended after installing kernel modules (e.g., FacetimeHD)
