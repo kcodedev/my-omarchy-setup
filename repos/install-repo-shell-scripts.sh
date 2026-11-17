@@ -66,7 +66,6 @@ install_wrapper "kc-cheatsheet-launch" "cheatsheet-launch.sh"
 install_wrapper "kc-emoji-launch" "emoji-launch.sh"
 install_wrapper "kc-keymap" "keymap.sh"
 install_wrapper "kc-search-launch" "search-launch.sh"
-install_wrapper "kc-git-repo-status" "git_repo_status.sh"
 
 echo "Shell-scripts repo setup complete!"
 

@@ -97,6 +97,13 @@ URCHIN_OMARCHY_PLUGIN_URL=https://github.com/example/urchin-plugin.git \
 ./master-installation.sh sync
 ```
 
+## Git Repository Dashboard
+
+The Git dashboard lives in the private repository `git@github.com:kcodedev/omarchy-git-repos.git`, checked out at `~/Repos/omarchy-git-repos`.
+`repos/install-git-dashboard.sh` installs it during Omarchy setup and sync. It owns the `kc-git-repo-status` launcher; the shell-scripts repo no longer installs a Git status script.
+
+Chezmoi owns the `kcodedev.git-repos` bar entry and the existing **Super + Shift + semicolon** shortcut. Background state stays local to each machine. Override `GIT_REPOS_PLUGIN_URL` or `GIT_REPOS_PLUGIN_DIR` to use another checkout.
+
 ## Dotfiles
 
 Chezmoi applies dotfiles from `~/.local/share/chezmoi`, using this repository:

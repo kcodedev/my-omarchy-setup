@@ -288,6 +288,7 @@ doctor() {
 
     report_repo_status "chezmoi source" "$HOME/.local/share/chezmoi"
     report_repo_status "shell-scripts repo" "$HOME/Repos/shell-scripts"
+    report_repo_status "Git dashboard repo" "$HOME/Repos/omarchy-git-repos"
     report_repo_status "urchin zmk repo" "$HOME/Repos/zmk-urchin-kcodedev"
     report_urchin_plugin_status
 
@@ -338,7 +339,7 @@ perform_install() {
     fi
 
     if [ "$include_omarchy_steps" -eq 1 ]; then
-        step_total=$((step_total + 2))
+        step_total=$((step_total + 3))
     fi
 
     echo "Setup mode: $MODE"
@@ -351,6 +352,7 @@ perform_install() {
     if [ "$include_omarchy_steps" -eq 1 ]; then
         run_step "Installing and updating Omarchy plugins" run_script plugins/install-omarchy-plugins.sh
         run_step "Syncing Urchin keyboard setup" run_script repos/install-urchin.sh
+        run_step "Syncing Git repository dashboard" run_script repos/install-git-dashboard.sh
     else
         echo
         echo "[skip] Omarchy config not present; skipping plugins and Urchin setup"
