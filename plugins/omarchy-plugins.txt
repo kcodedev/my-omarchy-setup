@@ -1,2 +1,3 @@
 # Plugin ID                              Git repository
 akshar.radio-atlas                       https://github.com/AksharP5/omarchy-radio-atlas.git
+typecraft.omacast                        https://github.com/typecraft-dev/oma-cast.git

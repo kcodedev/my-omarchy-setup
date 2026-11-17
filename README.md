@@ -72,6 +72,12 @@ or updates plugins on each `install` and `sync`. Add sources to
 to the chezmoi-managed `shell.json`.
 
 - [Radio Atlas](https://github.com/AksharP5/omarchy-radio-atlas) - provides the Radio Atlas bar widget
+- [omacast](https://github.com/typecraft-dev/oma-cast) (`typecraft.omacast`) - launcher with app search, Omarchy actions, and a calculator
+
+For omacast, keep its enabled menu entry in `shell.json` and its Hyprland
+keybindings in chezmoi so they are restored on new machines. The optional CLI
+can be linked after installation with
+`~/.config/omarchy/plugins/typecraft.omacast/bin/omacast install`.
 
 ## Urchin Keyboard
 
