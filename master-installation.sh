@@ -18,6 +18,7 @@ YAY_PACKAGES=(
     yazi
     localsend
     obsidian
+    omafeed
     dropbox-cli
     cava
     lazygit
@@ -276,6 +277,7 @@ doctor() {
     report_command_status npm
     report_command_status jq
     report_command_status omarchy
+    report_command_status omafeed
     report_command_status docker
 
     if has_local_bin_on_path; then

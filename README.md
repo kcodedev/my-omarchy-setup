@@ -19,6 +19,10 @@ Clone this repository, then run:
 Install and sync also reapply Brave preferences and managed policies.
 Keep `~/.local/bin` on `PATH` for npm's user-local install fallback.
 
+Install and sync include [Omafeed](https://github.com/pch/omafeed), the native RSS
+reader app, from the Omarchy package repository. Launch it from the app launcher
+or run `omafeed`. The companion bar plugin is optional and installed separately.
+
 ## Structure
 
 - `browsers/` - Browser-specific preference bootstrap scripts
